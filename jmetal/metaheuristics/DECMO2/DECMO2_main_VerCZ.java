@@ -128,7 +128,7 @@ public class DECMO2_main_VerCZ {
 				algorithm.setInputParameter("individualPopulationSize", 100);
 				algorithm.setInputParameter("reportInterval", 100);
 				algorithm.setInputParameter("maxEvaluations", 50000);
-				algorithm.setInputParameter("dataDirectory", "input\\decmo4Weights");
+				algorithm.setInputParameter("dataDirectory", "data\\input\\decmo2Weights");
 
 				// Execute the Algorithm
 				long initTime = System.currentTimeMillis();
