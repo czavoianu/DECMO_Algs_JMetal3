@@ -13,7 +13,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
 import jmetal.base.Algorithm;
-import jmetal.base.Operator;
 import jmetal.base.Problem;
 import jmetal.base.SolutionSet;
 import jmetal.problems.Kursawe;
@@ -47,8 +46,6 @@ import jmetal.problems.ZDT.ZDT2;
 import jmetal.problems.ZDT.ZDT3;
 import jmetal.problems.ZDT.ZDT4;
 import jmetal.problems.ZDT.ZDT6;
-import jmetal.qualityIndicator.QualityIndicator;
-import jmetal.util.Configuration;
 import jmetal.util.JMException;
 
 public class DECMO_main_VerCZ {
@@ -65,15 +62,6 @@ public class DECMO_main_VerCZ {
 	public static void main(String[] args) throws JMException, SecurityException, IOException, ClassNotFoundException {
 		List<Problem> problemsToSolve = new ArrayList<Problem>();
 		Algorithm algorithm; // The algorithm to use
-		Operator selection;
-		Operator crossover;
-
-		QualityIndicator indicators = null; // Object to get quality indicators
-
-		// Logger object and file to store log messages
-		logger_ = Configuration.logger_;
-		fileHandler_ = new FileHandler("YAMOA2_main.log");
-		logger_.addHandler(fileHandler_);
 
 		/** 31 benchmark problems */
 		/** 7 DTLZ benchmark problems */
@@ -138,39 +126,12 @@ public class DECMO_main_VerCZ {
 				 */
 				algorithm.setInputParameter("reportInterval", 100);
 
-				// Crossover operator
-				// crossover = CrossoverFactory
-				// .getCrossoverOperator("DifferentialEvolutionCrossover");
-				// crossover.setParameter("CR", 0.3);
-				// crossover.setParameter("F", 0.5);
-
-				// Add the operators to the algorithm
-				// selection = SelectionFactory
-				// .getSelectionOperator("DifferentialEvolutionSelection");
-				//
-				// algorithm.addOperator("crossover", crossover);
-				// algorithm.addOperator("selection", selection);
-
-				// Execute the Algorithm
+				/** Execute the Algorithm */
 				long initTime = System.currentTimeMillis();
 				SolutionSet population = algorithm.execute();
 				long estimatedTime = System.currentTimeMillis() - initTime;
 
-				// Result messages
-				logger_.info("Total execution time: " + estimatedTime + "ms");
-				logger_.info("Variables values have been writen to file VAR");
-				population.printVariablesToFile("VAR");
-				logger_.info("Objectives values have been writen to file FUN");
-				population.printObjectivesToFile("FUN");
-
-				if (indicators != null) {
-					logger_.info("Quality indicators");
-					logger_.info("Hypervolume: " + indicators.getHypervolume(population));
-					logger_.info("GD         : " + indicators.getGD(population));
-					logger_.info("IGD        : " + indicators.getIGD(population));
-					logger_.info("Spread     : " + indicators.getSpread(population));
-					logger_.info("Epsilon    : " + indicators.getEpsilon(population));
-				} // if
+				System.out.println("Total execution time: " + estimatedTime + "ms");
 			} // for repeats
 		} // for problems to solve
 	}// main
