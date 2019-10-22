@@ -1,10 +1,10 @@
 /**
- * DECMO_main_VerCZ.java
+ * DECMO2_main_VerCZ.java
  *
  * @author Ciprian Zavoianu
  * @version 1.0
  */
-package jmetal.metaheuristics.decmo;
+package jmetal.metaheuristics.DECMO2;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ import jmetal.qualityIndicator.QualityIndicator;
 import jmetal.util.Configuration;
 import jmetal.util.JMException;
 
-public class DECMO_main_VerCZ {
+public class DECMO2_main_VerCZ {
 	public static Logger logger_; // Logger object
 	public static FileHandler fileHandler_; // FileHandler object
 
@@ -72,7 +72,7 @@ public class DECMO_main_VerCZ {
 
 		// Logger object and file to store log messages
 		logger_ = Configuration.logger_;
-		fileHandler_ = new FileHandler("YAMOA2_main.log");
+		fileHandler_ = new FileHandler("DECMO3_main.log");
 		logger_.addHandler(fileHandler_);
 
 		/** 31 benchmark problems */
@@ -84,9 +84,9 @@ public class DECMO_main_VerCZ {
 		problemsToSolve.add(new DTLZ5("Real"));
 		problemsToSolve.add(new DTLZ6("Real"));
 		problemsToSolve.add(new DTLZ7("Real"));
-		/** 1 benchmark problem based on Kursawe's function */
+		// /** 1 benchmark problem based on Kursawe's function */
 		problemsToSolve.add(new Kursawe("Real", 10));
-		/** 9 LZ09 benchmark problems */
+		// /** 9 LZ09 benchmark problems */
 		problemsToSolve.add(new LZ09_F1("Real"));
 		problemsToSolve.add(new LZ09_F2("Real"));
 		problemsToSolve.add(new LZ09_F3("Real"));
@@ -96,14 +96,14 @@ public class DECMO_main_VerCZ {
 		problemsToSolve.add(new LZ09_F7("Real"));
 		problemsToSolve.add(new LZ09_F8("Real"));
 		problemsToSolve.add(new LZ09_F9("Real"));
-		/** 5 ZDT benchmark problems */
+		// /** 5 ZDT benchmark problems */
 		problemsToSolve.add(new ZDT1("Real", 30));
 		problemsToSolve.add(new ZDT2("Real", 30));
 		problemsToSolve.add(new ZDT3("Real", 10));
 		problemsToSolve.add(new ZDT4("Real", 10));
 		/** ZDT5 is not real-valued */
 		problemsToSolve.add(new ZDT6("Real"));
-		/** 9 WFG benchmark problems */
+		// /** 9 WFG benchmark problems */
 		problemsToSolve.add(new WFG1("Real"));
 		problemsToSolve.add(new WFG2("Real"));
 		problemsToSolve.add(new WFG3("Real"));
@@ -119,37 +119,16 @@ public class DECMO_main_VerCZ {
 		 * algorithm iterations)
 		 */
 		int algRepeats = 1;
+
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {
-				algorithm = new DECMO_VerCZ(problem);
+				algorithm = new DECMO2_VerCZ(problem);
 
-				/** DECMO parameters */
-				/**
-				 * The size of each subpopulation. The total population size is
-				 * double the subpopulation size
-				 */
-				algorithm.setInputParameter("populationSize", 100);
-				/** The number of iterations (i.e., generations) */
-				algorithm.setInputParameter("maxIterations", 250);
-				/**
-				 * After how many new individuals is algorithm progress (i.e.,
-				 * hypervolume) computed. In total the algorithm will evaluate
-				 * populationSize*2*maxIterations individuals
-				 */
+				// Algorithm parameters
+				algorithm.setInputParameter("individualPopulationSize", 100);
 				algorithm.setInputParameter("reportInterval", 100);
-
-				// Crossover operator
-				// crossover = CrossoverFactory
-				// .getCrossoverOperator("DifferentialEvolutionCrossover");
-				// crossover.setParameter("CR", 0.3);
-				// crossover.setParameter("F", 0.5);
-
-				// Add the operators to the algorithm
-				// selection = SelectionFactory
-				// .getSelectionOperator("DifferentialEvolutionSelection");
-				//
-				// algorithm.addOperator("crossover", crossover);
-				// algorithm.addOperator("selection", selection);
+				algorithm.setInputParameter("maxEvaluations", 50000);
+				algorithm.setInputParameter("dataDirectory", "input\\decmo4Weights");
 
 				// Execute the Algorithm
 				long initTime = System.currentTimeMillis();
@@ -171,7 +150,7 @@ public class DECMO_main_VerCZ {
 					logger_.info("Spread     : " + indicators.getSpread(population));
 					logger_.info("Epsilon    : " + indicators.getEpsilon(population));
 				} // if
-			} // for repeats
-		} // for problems to solve
+			} // for algRepeats
+		} // for problemsToSolve
 	}// main
-} // DECMO_main_VerCZ
+} // DECMO2_main_VerCZ

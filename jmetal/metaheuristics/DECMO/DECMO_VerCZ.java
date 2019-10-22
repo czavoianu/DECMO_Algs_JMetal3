@@ -4,7 +4,7 @@
  * @author Ciprian Zavoianu
  * @version 1.0
  */
-package jmetal.metaheuristics.decmo;
+package jmetal.metaheuristics.DECMO;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -361,7 +361,7 @@ public class DECMO_VerCZ extends Algorithm {
 					spea2.fitnessAssign();
 					pool2 = spea2.environmentalSelection(pool2Size);
 				}
-			} // if initial Population
+			} // if initialPopulation
 			if (initialPopulation) {
 				initialPopulation = false;
 			}
