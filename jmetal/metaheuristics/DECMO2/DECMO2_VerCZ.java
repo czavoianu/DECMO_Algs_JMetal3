@@ -60,7 +60,6 @@ import jmetal.problems.ZDT.ZDT3;
 import jmetal.problems.ZDT.ZDT4;
 import jmetal.problems.ZDT.ZDT6;
 import jmetal.qualityIndicator.QualityIndicator;
-import jmetal.util.Distance;
 import jmetal.util.JMException;
 import jmetal.util.PseudoRandom;
 import jmetal.util.Ranking;
@@ -263,7 +262,7 @@ public class DECMO2_VerCZ extends Algorithm {
 	} // evaluateTchebycheffFitness
 
 	/**
-	 * Runs of the DECMO2 algorithm.
+	 * Runs the DECMO2 algorithm.
 	 * 
 	 * @return a <code>SolutionSet</code> that is a set of non dominated
 	 *         solutions as a result of the algorithm execution
@@ -282,9 +281,6 @@ public class DECMO2_VerCZ extends Algorithm {
 		SolutionSet dirInsertPool1;
 		SolutionSet dirInsertPool2;
 		SolutionSet dirInsertPool3;
-
-		SolutionSet union;
-		Distance distance = new Distance();
 
 		Comparator dominance = new jmetal.base.operator.comparator.DominanceComparator();
 

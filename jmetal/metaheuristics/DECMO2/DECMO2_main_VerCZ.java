@@ -118,7 +118,7 @@ public class DECMO2_main_VerCZ {
 		 * number of times each problem should be solved (i.e., independent
 		 * algorithm iterations)
 		 */
-		int algRepeats = 1;
+		int algRepeats = 5;
 
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {
@@ -128,7 +128,7 @@ public class DECMO2_main_VerCZ {
 				algorithm.setInputParameter("individualPopulationSize", 100);
 				algorithm.setInputParameter("reportInterval", 100);
 				algorithm.setInputParameter("maxEvaluations", 50000);
-				algorithm.setInputParameter("dataDirectory", "data\\input\\decmo2Weights");
+				algorithm.setInputParameter("dataDirectory", "data\\input\\DECMO2Weights");
 
 				// Execute the Algorithm
 				long initTime = System.currentTimeMillis();

@@ -83,7 +83,7 @@ public class DECMO_VerCZ extends Algorithm {
 	} // GDE3
 
 	/**
-	 * Runs of the GDE3 algorithm.
+	 * Run the DECMO algorithm.
 	 * 
 	 * @return a <code>SolutionSet</code> that is a set of non dominated
 	 *         solutions as a result of the algorithm execution
