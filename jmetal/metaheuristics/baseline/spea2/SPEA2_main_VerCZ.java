@@ -135,7 +135,7 @@ public class SPEA2_main_VerCZ {
 		problemsToSolve.add(new ZDT2("Real", 30));
 		problemsToSolve.add(new ZDT4("Real", 10));
 
-		int algRepeats = 15;
+		int algRepeats = 1;
 
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {

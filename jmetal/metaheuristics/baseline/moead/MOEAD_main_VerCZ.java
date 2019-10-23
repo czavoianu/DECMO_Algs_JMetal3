@@ -128,7 +128,7 @@ public class MOEAD_main_VerCZ {
 		/** ZDT5 is not real-valued */
 		problemsToSolve.add(new ZDT6("Real")); // 2obj
 
-		int algRepeats = 15;
+		int algRepeats = 1;
 
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {
