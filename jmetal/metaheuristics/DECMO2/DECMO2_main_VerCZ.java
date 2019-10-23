@@ -84,13 +84,6 @@ public class DECMO2_main_VerCZ {
 		problemsToSolve.add(new LZ09_F7("Real"));
 		problemsToSolve.add(new LZ09_F8("Real"));
 		problemsToSolve.add(new LZ09_F9("Real"));
-		// /** 5 ZDT benchmark problems */
-		problemsToSolve.add(new ZDT1("Real", 30));
-		problemsToSolve.add(new ZDT2("Real", 30));
-		problemsToSolve.add(new ZDT3("Real", 10));
-		problemsToSolve.add(new ZDT4("Real", 10));
-		/** ZDT5 is not real-valued */
-		problemsToSolve.add(new ZDT6("Real"));
 		// /** 9 WFG benchmark problems */
 		problemsToSolve.add(new WFG1("Real"));
 		problemsToSolve.add(new WFG2("Real"));
@@ -101,12 +94,19 @@ public class DECMO2_main_VerCZ {
 		problemsToSolve.add(new WFG7("Real"));
 		problemsToSolve.add(new WFG8("Real"));
 		problemsToSolve.add(new WFG9("Real"));
+		// /** 5 ZDT benchmark problems */
+		problemsToSolve.add(new ZDT1("Real", 30));
+		problemsToSolve.add(new ZDT2("Real", 30));
+		problemsToSolve.add(new ZDT3("Real", 10));
+		problemsToSolve.add(new ZDT4("Real", 10));
+		/** ZDT5 is not real-valued */
+		problemsToSolve.add(new ZDT6("Real"));
 
 		/**
 		 * number of times each problem should be solved (i.e., independent
 		 * algorithm iterations)
 		 */
-		int algRepeats = 5;
+		int algRepeats = 13;
 
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {
@@ -120,10 +120,12 @@ public class DECMO2_main_VerCZ {
 
 				/** Execute the Algorithm */
 				long initTime = System.currentTimeMillis();
-				SolutionSet population = algorithm.execute();
+				SolutionSet finalNonDominatedSet = algorithm.execute();
 				long estimatedTime = System.currentTimeMillis() - initTime;
 
-				System.out.println("Total execution time: " + estimatedTime + "ms");
+				/** Show execution info */
+				System.out.println("Total execution time: " + estimatedTime
+						+ "ms. Final non-dominted solution set size: " + finalNonDominatedSet.size());
 			} // for algRepeats
 		} // for problemsToSolve
 	}// main

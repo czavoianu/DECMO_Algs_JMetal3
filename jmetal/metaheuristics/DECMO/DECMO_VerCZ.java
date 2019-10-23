@@ -57,7 +57,6 @@ import jmetal.problems.ZDT.ZDT6;
 import jmetal.qualityIndicator.QualityIndicator;
 import jmetal.util.Distance;
 import jmetal.util.JMException;
-import jmetal.util.Ranking;
 import jmetal.util.Spea2Fitness;
 
 /**
@@ -113,7 +112,7 @@ public class DECMO_VerCZ extends Algorithm {
 		Comparator dominance;
 
 		// Read the DECMO parameters
-		populationSize = ((Integer) this.getInputParameter("populationSize")).intValue();
+		populationSize = ((Integer) this.getInputParameter("individualPopulationSize")).intValue();
 		maxIterations = ((Integer) this.getInputParameter("maxIterations")).intValue();
 		reportInterval = ((Integer) getInputParameter("reportInterval")).intValue();
 
@@ -392,8 +391,8 @@ public class DECMO_VerCZ extends Algorithm {
 		}
 
 		try {
-			File hvFile = new File("data\\output\\runtimePerformance\\DECMO\\ASize" + 2 * populationSize + "_PSize"
-					+ 2 * populationSize + "\\" + PROBLEM_NAME + "\\HV.csv");
+			File hvFile = new File("data\\output\\runtimePerformance\\DECMO\\SolutionSetSize" + 2 * populationSize
+					+ "\\" + PROBLEM_NAME + "\\HV.csv");
 			File dir = new File(hvFile.getParent());
 			if (!dir.exists() && !dir.mkdirs()) {
 				System.out.println("Could not create directory path: ");
@@ -409,8 +408,16 @@ public class DECMO_VerCZ extends Algorithm {
 		}
 
 		// Return the first non-dominated front
-		Ranking ranking = new Ranking(pool2);
-		return ranking.getSubfront(0);
+		/**
+		 * Return the final combined non-dominated set of maximum size =
+		 * (pool1Size + pool2Size)
+		 */
+		SolutionSet combiIni = new SolutionSet();
+		combiIni = ((combiIni.union(pool1)).union(pool2));
+		Spea2Fitness speaF = new Spea2Fitness(combiIni);
+		speaF.fitnessAssign();
+		combiIni = speaF.environmentalSelection(pool1Size + pool2Size);
+		return combiIni;
 	} // execute
 
 	private void saveLastArchiveToFile(SolutionSet archive) throws IOException {

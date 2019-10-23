@@ -62,7 +62,6 @@ import jmetal.problems.ZDT.ZDT6;
 import jmetal.qualityIndicator.QualityIndicator;
 import jmetal.util.JMException;
 import jmetal.util.PseudoRandom;
-import jmetal.util.Ranking;
 import jmetal.util.Spea2Fitness;
 
 /**
@@ -504,16 +503,16 @@ public class DECMO2_VerCZ extends Algorithm {
 		bonusEvals[2] = nrOfDirectionalSolutionsToEvolve;
 		boolean testRun = true;
 
-		/** report the generational HV of the initial population */
-		SolutionSet combiIni = new SolutionSet();
+		/** record the generational HV of the initial population */
+		SolutionSet combiAll = new SolutionSet();
 		int cGen = evaluations / reportInterval;
 		if (cGen > 0) {
 
-			combiIni = (((combiIni.union(pool1)).union(pool2)).union(poolA));
-			Spea2Fitness spea5 = new Spea2Fitness(combiIni);
-			spea5.fitnessAssign();
-			combiIni = spea5.environmentalSelection(pool1Size + pool2Size);
-			double hVal = indicator.getHypervolume(combiIni);
+			combiAll = (((combiAll.union(pool1)).union(pool2)).union(poolA));
+			Spea2Fitness spea0 = new Spea2Fitness(combiAll);
+			spea0.fitnessAssign();
+			combiAll = spea0.environmentalSelection(pool1Size + pool2Size);
+			double hVal = indicator.getHypervolume(combiAll);
 			System.out.println("Hypervolume: " + cGen + " - " + hVal);
 			for (int j = 0; j < cGen; j++) {
 				generationalHV.add(hVal);
@@ -767,7 +766,7 @@ public class DECMO2_VerCZ extends Algorithm {
 				combi = (((combi.union(pool1)).union(pool2)).union(offspringPop3));
 				Spea2Fitness spea5 = new Spea2Fitness(combi);
 				spea5.fitnessAssign();
-				combi = spea5.environmentalSelection(pool1Size + pool2Size);
+				combi = spea5.environmentalSelection(populationSize * 2);
 				double hVal = indicator.getHypervolume(combi);
 				for (int j = currentGen; j < newGen; j++) {
 					generationalHV.add(hVal);
@@ -784,8 +783,8 @@ public class DECMO2_VerCZ extends Algorithm {
 		}
 
 		try {
-			File hvFile = new File("data\\output\\runtimePerformance\\DECMO2\\ASize" + 2 * populationSize + "_PSize"
-					+ 2 * populationSize + "\\" + PROBLEM_NAME + "\\HV.csv");
+			File hvFile = new File("data\\output\\runtimePerformance\\DECMO2\\SolutionSetSize" + 2 * populationSize
+					+ "\\" + PROBLEM_NAME + "\\HV.csv");
 			File dir = new File(hvFile.getParent());
 			if (!dir.exists() && !dir.mkdirs()) {
 				System.out.println("Could not create directory path: ");
@@ -800,9 +799,16 @@ public class DECMO2_VerCZ extends Algorithm {
 			e.printStackTrace();
 		}
 
-		// Return the first non-dominated front
-		Ranking ranking = new Ranking(pool2);
-		return ranking.getSubfront(0);
+		/**
+		 * Return the final combined non-dominated set of maximum size =
+		 * (populationSize * 2)
+		 */
+		combiAll = new SolutionSet();
+		combiAll = (((combiAll.union(pool1)).union(pool2)).union(poolA));
+		Spea2Fitness speaF = new Spea2Fitness(combiAll);
+		speaF.fitnessAssign();
+		combiAll = speaF.environmentalSelection(populationSize * 2);
+		return combiAll;
 	} // execute
 
 	/**
