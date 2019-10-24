@@ -121,7 +121,7 @@ public class GDE3_main_VerCZ {
 		/** ZDT5 is not real-valued */
 		problemsToSolve.add(new ZDT6("Real"));
 
-		int algRepeats = 1;
+		int algRepeats = 35;
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {
 				algorithm = new GDE3_VerCZ(problem);

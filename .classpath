@@ -2,5 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="E:/Work/91_localWorkspace/00_GitHubRepos/DECMO_Algs_JMetal3/libraries/jsc.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

@@ -130,12 +130,7 @@ public class SPEA2_main_VerCZ {
 		/** ZDT5 is not real-valued */
 		problemsToSolve.add(new ZDT6("Real"));
 
-		problemsToSolve.add(new DTLZ5("Real"));
-		problemsToSolve.add(new ZDT1("Real", 30));
-		problemsToSolve.add(new ZDT2("Real", 30));
-		problemsToSolve.add(new ZDT4("Real", 10));
-
-		int algRepeats = 1;
+		int algRepeats = 35;
 
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {
