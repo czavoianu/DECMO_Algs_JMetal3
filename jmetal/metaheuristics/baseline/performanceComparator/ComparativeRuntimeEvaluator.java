@@ -596,10 +596,10 @@ public class ComparativeRuntimeEvaluator {
 		int rankGranularity;
 
 		/** Result paths to include in comparison */
-		classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize200//");
-		classesToCompare.add("data//output//runtimePerformance//NSGA2//SolutionSetSize200//");
-		classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize200//");
-		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize595//");
+		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize200//");
+		// classesToCompare.add("data//output//runtimePerformance//NSGA2//SolutionSetSize200//");
+		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize200//");
+		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSizeLitRecom//");
 		classesToCompare.add("data//output//runtimePerformance//DECMO//SolutionSetSize200//");
 		classesToCompare.add("data//output//runtimePerformance//DECMO2//SolutionSetSize200//");
 		classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize200//");
