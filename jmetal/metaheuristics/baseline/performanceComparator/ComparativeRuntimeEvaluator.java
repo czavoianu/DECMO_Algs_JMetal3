@@ -1,3 +1,11 @@
+/**
+ * ComparativeRuntimeEvaluator.java
+ *
+ * Class for performing comparative runtime analyses using pre-saved data points (only implemented metric is the hypervolume)
+ *
+ * @author Ciprian Zavoianu
+ * @version 1.0
+ */
 package jmetal.metaheuristics.baseline.performanceComparator;
 
 import java.io.BufferedReader;
@@ -214,7 +222,7 @@ public class ComparativeRuntimeEvaluator {
 				sortingMap.put(value, ctc);
 			}
 
-			double lastHVVal = 0.0;
+			// double lastHVVal = 0.0;
 			int j = 0;
 			int rank = classesToCompare.size();
 			double[] lastHvIndValuesArray = new double[1];
@@ -223,7 +231,7 @@ public class ComparativeRuntimeEvaluator {
 			for (Map.Entry<Double, String> entry : sortingMap.entrySet()) {
 				double newValue = 1.0 * rank;
 				if (j == 0) {
-					lastHVVal = entry.getKey();
+					// lastHVVal = entry.getKey();
 					lastHvIndValuesArray = extractHvIndRunValues(indHvValues, entry.getValue(), dataPointIndex);
 				} else {
 					newHvIndValuesArray = extractHvIndRunValues(indHvValues, entry.getValue(), dataPointIndex);
@@ -233,7 +241,7 @@ public class ComparativeRuntimeEvaluator {
 					} else {
 						rank--;
 						newValue = 1.0 * rank;
-						lastHVVal = entry.getKey();
+						// lastHVVal = entry.getKey();
 						lastHvIndValuesArray = newHvIndValuesArray;
 					}
 				}
@@ -269,111 +277,114 @@ public class ComparativeRuntimeEvaluator {
 		return result;
 	}
 
-	private static Map<String, List<Double>> computeAverageRankPerformanceOptimistic(List<String> classesToCompare,
-			Map<String, List<Double>> averageHvValues, int rankGranularity, double relevanceFactor) {
-
-		Map<String, List<Double>> result = new HashMap<String, List<Double>>();
-
-		int minCount = 10000000;
-		for (String ctc : classesToCompare) {
-			List<Double> values = averageHvValues.get(ctc);
-			if (values.size() < minCount) {
-				minCount = values.size();
-			}
-		}
-
-		for (String ctc : classesToCompare) {
-			result.put(ctc, new ArrayList<Double>());
-		}
-
-		int i = 1;
-		while (i <= minCount) {
-			Map<Double, String> sortingMap = new TreeMap<Double, String>();
-
-			// System.out.println("--------------");
-			// System.out.println("\n " + i + "\n");
-
-			double epsilon = 0.000000001;
-			int equalsFound = 0;
-			for (String ctc : classesToCompare) {
-				List<Double> values = averageHvValues.get(ctc);
-				double value = values.get(i - 1);
-				if (value == 100.0) {
-					equalsFound += 1;
-					value -= equalsFound * epsilon;
-				}
-				if (value == 0.0) {
-					equalsFound += 1;
-					value += equalsFound * epsilon;
-				}
-				sortingMap.put(value, ctc);
-			}
-
-			double lastHVVal = 0.0;
-			int j = 0;
-			int rank = classesToCompare.size();
-			Map<String, Double> rawVals = new HashMap<String, Double>();
-			for (Map.Entry<Double, String> entry : sortingMap.entrySet()) {
-				// System.out.println(entry.getKey() + " " + entry.getValue());
-				// List<Double> values = result.get(entry.getValue());
-				double newValue = 1.0 * rank;
-
-				if (entry.getKey() > 99.0) {
-					newValue = 0.0;
-				} else if (entry.getKey() < 1.0) {
-					newValue = 1.0 * (classesToCompare.size() + 1);
-				} else if (j != 0) {
-					if ((entry.getKey() - relevanceFactor) < lastHVVal) {
-						newValue = 1.0 * rank;
-					} else {
-						rank--;
-						newValue = 1.0 * rank;
-						lastHVVal = entry.getKey();
-					}
-				}
-
-				// values.add(newValue);
-				if (j == 0) {
-					lastHVVal = entry.getKey();
-				}
-				rawVals.put(entry.getValue(), newValue);
-				j++;
-			}
-			// System.out.println("--------------");
-
-			double minRank = classesToCompare.size();
-			for (Map.Entry<String, Double> entry : rawVals.entrySet()) {
-				if ((entry.getValue() != 0.0) && (entry.getValue() < minRank)) {
-					minRank = entry.getValue();
-				}
-			}
-			for (Map.Entry<String, Double> entry : rawVals.entrySet()) {
-				List<Double> values = result.get(entry.getKey());
-				if ((entry.getValue() != 0.0) && (entry.getValue() != (classesToCompare.size() + 1))) {
-					double newRank = entry.getValue() - minRank + 1.0;
-					values.add(newRank);
-				} else {
-					values.add(entry.getValue());
-				}
-			}
-
-			i += rankGranularity;
-		}
-
-		// for (String ctc : classesToCompare) {
-		// List<Double> values = result.get(ctc);
-		// System.out.println("---------------");
-		// System.out.println(ctc);
-		// String s = "";
-		// for (Double val : values) {
-		// s += val + ", ";
-		// }
-		// System.out.println(s);
-		// System.out.println("---------------");
-		// }
-
-		return result;
-	}
+	// private static Map<String, List<Double>>
+	// computeAverageRankPerformanceOptimistic(List<String> classesToCompare,
+	// Map<String, List<Double>> averageHvValues, int rankGranularity, double
+	// relevanceFactor) {
+	//
+	// Map<String, List<Double>> result = new HashMap<String, List<Double>>();
+	//
+	// int minCount = 10000000;
+	// for (String ctc : classesToCompare) {
+	// List<Double> values = averageHvValues.get(ctc);
+	// if (values.size() < minCount) {
+	// minCount = values.size();
+	// }
+	// }
+	//
+	// for (String ctc : classesToCompare) {
+	// result.put(ctc, new ArrayList<Double>());
+	// }
+	//
+	// int i = 1;
+	// while (i <= minCount) {
+	// Map<Double, String> sortingMap = new TreeMap<Double, String>();
+	//
+	// // System.out.println("--------------");
+	// // System.out.println("\n " + i + "\n");
+	//
+	// double epsilon = 0.000000001;
+	// int equalsFound = 0;
+	// for (String ctc : classesToCompare) {
+	// List<Double> values = averageHvValues.get(ctc);
+	// double value = values.get(i - 1);
+	// if (value == 100.0) {
+	// equalsFound += 1;
+	// value -= equalsFound * epsilon;
+	// }
+	// if (value == 0.0) {
+	// equalsFound += 1;
+	// value += equalsFound * epsilon;
+	// }
+	// sortingMap.put(value, ctc);
+	// }
+	//
+	// double lastHVVal = 0.0;
+	// int j = 0;
+	// int rank = classesToCompare.size();
+	// Map<String, Double> rawVals = new HashMap<String, Double>();
+	// for (Map.Entry<Double, String> entry : sortingMap.entrySet()) {
+	// // System.out.println(entry.getKey() + " " + entry.getValue());
+	// // List<Double> values = result.get(entry.getValue());
+	// double newValue = 1.0 * rank;
+	//
+	// if (entry.getKey() > 99.0) {
+	// newValue = 0.0;
+	// } else if (entry.getKey() < 1.0) {
+	// newValue = 1.0 * (classesToCompare.size() + 1);
+	// } else if (j != 0) {
+	// if ((entry.getKey() - relevanceFactor) < lastHVVal) {
+	// newValue = 1.0 * rank;
+	// } else {
+	// rank--;
+	// newValue = 1.0 * rank;
+	// lastHVVal = entry.getKey();
+	// }
+	// }
+	//
+	// // values.add(newValue);
+	// if (j == 0) {
+	// lastHVVal = entry.getKey();
+	// }
+	// rawVals.put(entry.getValue(), newValue);
+	// j++;
+	// }
+	// // System.out.println("--------------");
+	//
+	// double minRank = classesToCompare.size();
+	// for (Map.Entry<String, Double> entry : rawVals.entrySet()) {
+	// if ((entry.getValue() != 0.0) && (entry.getValue() < minRank)) {
+	// minRank = entry.getValue();
+	// }
+	// }
+	// for (Map.Entry<String, Double> entry : rawVals.entrySet()) {
+	// List<Double> values = result.get(entry.getKey());
+	// if ((entry.getValue() != 0.0) && (entry.getValue() !=
+	// (classesToCompare.size() + 1))) {
+	// double newRank = entry.getValue() - minRank + 1.0;
+	// values.add(newRank);
+	// } else {
+	// values.add(entry.getValue());
+	// }
+	// }
+	//
+	// i += rankGranularity;
+	// }
+	//
+	// // for (String ctc : classesToCompare) {
+	// // List<Double> values = result.get(ctc);
+	// // System.out.println("---------------");
+	// // System.out.println(ctc);
+	// // String s = "";
+	// // for (Double val : values) {
+	// // s += val + ", ";
+	// // }
+	// // System.out.println(s);
+	// // System.out.println("---------------");
+	// // }
+	//
+	// return result;
+	// }
 
 	private static Map<String, List<Double>> computeAverageRankPerformancePessimistic(List<String> classesToCompare,
 			Map<String, List<Double>> averageHvValues, int rankGranularity, double relevanceFactor, double minVal,
@@ -459,41 +470,40 @@ public class ComparativeRuntimeEvaluator {
 		return result;
 	}
 
-	private static List<Double> computeIndividualThresholdPerformance(String ctc, Problem problem, String problemName,
-			String metric, Double metricThreshold) throws IOException {
-
-		List<Double> result = new ArrayList<Double>();
-		String fileName = ctc + problemName + "//" + metric + ".csv";
-		BufferedReader br = new BufferedReader(new FileReader(fileName));
-		String line;
-		int testCount = 0;
-		QualityIndicator indicator = new QualityIndicator(problem,
-				"data\\input\\trueParetoFronts\\" + problemName + ".pareto");
-
-		while ((line = br.readLine()) != null) {
-			String[] lineTokens = line.split("\\,");
-			if (lineTokens.length > 10) {
-				testCount++;
-				int j = 0;
-				for (int i = 0; i < lineTokens.length; i++) {
-					double val = Double.parseDouble(lineTokens[i]);
-					if (!Double.isNaN(val)) {
-						val = val / indicator.getTrueParetoFrontHypervolume();
-						if (val > metricThreshold) {
-							result.add(j * 100.0);
-							break;
-						}
-
-						j++;
-					}
-				}
-			}
-		}
-		br.close();
-
-		return result;
-
-	}
+	// private static List<Double> computeIndividualThresholdPerformance(String
+	// ctc, Problem problem, String problemName,
+	// String metric, Double metricThreshold) throws IOException {
+	//
+	// List<Double> result = new ArrayList<Double>();
+	// String fileName = ctc + problemName + "//" + metric + ".csv";
+	// BufferedReader br = new BufferedReader(new FileReader(fileName));
+	// String line;
+	// QualityIndicator indicator = new QualityIndicator(problem,
+	// "data\\input\\trueParetoFronts\\" + problemName + ".pareto");
+	//
+	// while ((line = br.readLine()) != null) {
+	// String[] lineTokens = line.split("\\,");
+	// if (lineTokens.length > 10) {
+	// int j = 0;
+	// for (int i = 0; i < lineTokens.length; i++) {
+	// double val = Double.parseDouble(lineTokens[i]);
+	// if (!Double.isNaN(val)) {
+	// val = val / indicator.getTrueParetoFrontHypervolume();
+	// if (val > metricThreshold) {
+	// result.add(j * 100.0);
+	// break;
+	// }
+	//
+	// j++;
+	// }
+	// }
+	// }
+	// }
+	// br.close();
+	//
+	// return result;
+	//
+	// }
 
 	private static boolean differenceIsStatisticallySignificant(double[] newHvIndValuesArray,
 			double[] lastHvIndValuesArray, double levelOfSignificance) {
@@ -547,14 +557,12 @@ public class ComparativeRuntimeEvaluator {
 		String fileName = ctc + problemName + "//" + metric + ".csv";
 		BufferedReader br = new BufferedReader(new FileReader(fileName));
 		String line;
-		int testCount = 0;
 		QualityIndicator indicator = new QualityIndicator(problem,
 				"data\\input\\trueParetoFronts\\" + problemName + ".pareto");
 
 		while ((line = br.readLine()) != null) {
 			String[] lineTokens = line.split("\\,");
 			if (lineTokens.length > 10) {
-				testCount++;
 				List<Double> currentRun = new ArrayList<Double>();
 
 				if (lineTokens.length > dataPointsCount) {
@@ -587,24 +595,52 @@ public class ComparativeRuntimeEvaluator {
 
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 
+		/** Main initializations */
+		List<String> rankingTypeToConstruct = new ArrayList<String>();
 		List<String> classesToCompare = new ArrayList<String>();
 		List<Problem> problemsToUseInComparison = new ArrayList<Problem>();
-		String resultPath;
-		String problemName = "Problem";
-		String metric;
-		Double metricThreshold = 0.0;
-		int rankGranularity;
 
-		/** Result paths to include in comparison */
+		// TODO adjust the variables "nameOfAnalysis", "rankingTypeToConstruct",
+		// "classesToCompare" and "problemsToUseInComparison" as necessary
+
+		/**
+		 * Generic description of the algorithms that are compared: e.g.,
+		 * "allAlgortihms" = comparison between all runtime results available,
+		 * "DECMOFamily" = comparison between the three DECMO variants and
+		 * "DECMO2vsNSGA2" = comparison between the DECMO2 and NSGA2 solvers
+		 */
+		String nameOfAnalysis = "MOEAD_DRA_DiffPopSizes";
+
+		/**
+		 * Type of rankings to use when building the Hypervolume-Ranked
+		 * Performance Curves (HRPCs)
+		 */
+		rankingTypeToConstruct.add("1_basicRanking");
+		rankingTypeToConstruct.add("2_pessimisticRanking_1Percent");
+		rankingTypeToConstruct.add("3_pessimisticRanking_5Percent");
+		rankingTypeToConstruct.add("4_pessimisticRanking_10Percent");
+		rankingTypeToConstruct.add("5_statisticalRanking");
+
+		/**
+		 * Result paths to include in comparison, i.e., algorithms to include in
+		 * the comparison
+		 */
 		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize200//");
 		// classesToCompare.add("data//output//runtimePerformance//NSGA2//SolutionSetSize200//");
 		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize200//");
-		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSizeLitRecom//");
-		classesToCompare.add("data//output//runtimePerformance//DECMO//SolutionSetSize200//");
-		classesToCompare.add("data//output//runtimePerformance//DECMO2//SolutionSetSize200//");
-		classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize200//");
+		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSizeLitRecom//");
+		// classesToCompare.add("data//output//runtimePerformance//DECMO//SolutionSetSize200//");
+		// classesToCompare.add("data//output//runtimePerformance//DECMO2//SolutionSetSize200//");
+		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize200//");
 
-		/** Benchmark problems to include in comparison */
+		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize100//");
+		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize200//");
+		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize300//");
+		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize400//");
+		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize500//");
+		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize595//");
+
+		/** Benchmark problems to include in the comparison */
 		problemsToUseInComparison.add(new DTLZ1("Real")); // 1
 		problemsToUseInComparison.add(new DTLZ2("Real")); // 2
 		problemsToUseInComparison.add(new DTLZ3("Real")); // 3
@@ -637,180 +673,200 @@ public class ComparativeRuntimeEvaluator {
 		problemsToUseInComparison.add(new ZDT4("Real", 10)); // 30
 		problemsToUseInComparison.add(new ZDT6("Real", 10)); // 31
 
-		Map<String, Map<String, List<Double>>> performanceRankMatrices = new HashMap<String, Map<String, List<Double>>>();
-		Map<String, List<Double>> averageHvConvergenceTrends = new HashMap<String, List<Double>>();
+		for (String rankingType : rankingTypeToConstruct) {
 
-		/** Output path for comparative evaluation result files */
-		resultPath = "data//output//runtimePerformance//comparativeResults//allTogether//";
-		metricThreshold = 0.85;
-		metric = "HV";
-		rankGranularity = 10;
+			Map<String, Map<String, List<Double>>> performanceRankMatrices = new HashMap<String, Map<String, List<Double>>>();
+			Map<String, List<Double>> averageHvConvergenceTrends = new HashMap<String, List<Double>>();
 
-		for (String ctc : classesToCompare) {
-			performanceRankMatrices.put(ctc, new TreeMap<String, List<Double>>());
-			// averageHvConvergenceTrends.put(ctc, new ArrayList<Double>());
-		}
-
-		int problemNo = 0;
-		for (Problem problem : problemsToUseInComparison) {
-
-			problemNo++;
-
-			if (problem instanceof DTLZ1) {
-				problemName = "DTLZ1_7";
-			}
-			if (problem instanceof DTLZ2) {
-				problemName = "DTLZ2_12";
-			}
-			if (problem instanceof DTLZ3) {
-				problemName = "DTLZ3_12";
-			}
-			if (problem instanceof DTLZ4) {
-				problemName = "DTLZ4_12";
-			}
-			if (problem instanceof DTLZ5) {
-				problemName = "DTLZ5_12";
-			}
-			if (problem instanceof DTLZ6) {
-				problemName = "DTLZ6_12";
-			}
-			if (problem instanceof DTLZ7) {
-				problemName = "DTLZ7_22";
-			}
-			if (problem instanceof ZDT1) {
-				problemName = "ZDT1_30";
-			}
-			if (problem instanceof ZDT2) {
-				problemName = "ZDT2_30";
-			}
-			if (problem instanceof ZDT3) {
-				problemName = "ZDT3_10";
-			}
-			if (problem instanceof ZDT4) {
-				problemName = "ZDT4_10";
-			}
-			if (problem instanceof ZDT6) {
-				problemName = "ZDT6_10";
-			}
-			if (problem instanceof WFG1) {
-				problemName = "WFG1_6";
-			}
-			if (problem instanceof WFG2) {
-				problemName = "WFG2_6";
-			}
-			if (problem instanceof WFG3) {
-				problemName = "WFG3_6";
-			}
-			if (problem instanceof WFG4) {
-				problemName = "WFG4_6";
-			}
-			if (problem instanceof WFG5) {
-				problemName = "WFG5_6";
-			}
-			if (problem instanceof WFG6) {
-				problemName = "WFG6_6";
-			}
-			if (problem instanceof WFG7) {
-				problemName = "WFG7_6";
-			}
-			if (problem instanceof WFG8) {
-				problemName = "WFG8_6";
-			}
-			if (problem instanceof WFG9) {
-				problemName = "WFG9_6";
-			}
-			if (problem instanceof LZ09_F1) {
-				problemName = "LZ09_F1_30";
-			}
-			if (problem instanceof LZ09_F2) {
-				problemName = "LZ09_F2_30";
-			}
-			if (problem instanceof LZ09_F3) {
-				problemName = "LZ09_F3_30";
-			}
-			if (problem instanceof LZ09_F4) {
-				problemName = "LZ09_F4_30";
-			}
-			if (problem instanceof LZ09_F5) {
-				problemName = "LZ09_F5_30";
-			}
-			if (problem instanceof LZ09_F6) {
-				problemName = "LZ09_F6_30";
-			}
-			if (problem instanceof LZ09_F7) {
-				problemName = "LZ09_F7_10";
-			}
-			if (problem instanceof LZ09_F8) {
-				problemName = "LZ09_F8_10";
-			}
-			if (problem instanceof LZ09_F9) {
-				problemName = "LZ09_F9_30";
-			}
-			if (problem instanceof Kursawe) {
-				problemName = "KSW_10";
-			}
-
-			Map<String, List<Double>> averageHvValues = new HashMap<String, List<Double>>();
-			Map<String, List<Double>> indHvPerformances = new HashMap<String, List<Double>>();
-			Map<String, List<Double>> averageRankPerformance = new HashMap<String, List<Double>>();
-			Map<String, List<List<Double>>> indHvValues = new HashMap<String, List<List<Double>>>();
+			/** Output path for comparative evaluation result files */
+			String outputPath = "data//output//runtimePerformance//comparativePerformance//" + nameOfAnalysis + "//";
+			// Double metricThreshold = 0.85;
+			String metric = "HV";
+			/**
+			 * After how many consecutive runtime data points (i.e.,
+			 * generations) should be rankings be performed
+			 */
+			int rankGranularity = 10;
+			String problemName = "Problem";
 
 			for (String ctc : classesToCompare) {
-				List<Double> averageHvConvergenceValues = computeAverageConvergenceCurve(ctc, problem, problemName,
-						metric);
-				List<List<Double>> individualHvConvergnceValues = extractIndividualConvergenceValues(ctc, problem,
+				performanceRankMatrices.put(ctc, new TreeMap<String, List<Double>>());
+				// averageHvConvergenceTrends.put(ctc, new ArrayList<Double>());
+			}
+
+			int problemNo = 0;
+			for (Problem problem : problemsToUseInComparison) {
+
+				problemNo++;
+
+				if (problem instanceof DTLZ1) {
+					problemName = "DTLZ1_7";
+				}
+				if (problem instanceof DTLZ2) {
+					problemName = "DTLZ2_12";
+				}
+				if (problem instanceof DTLZ3) {
+					problemName = "DTLZ3_12";
+				}
+				if (problem instanceof DTLZ4) {
+					problemName = "DTLZ4_12";
+				}
+				if (problem instanceof DTLZ5) {
+					problemName = "DTLZ5_12";
+				}
+				if (problem instanceof DTLZ6) {
+					problemName = "DTLZ6_12";
+				}
+				if (problem instanceof DTLZ7) {
+					problemName = "DTLZ7_22";
+				}
+				if (problem instanceof ZDT1) {
+					problemName = "ZDT1_30";
+				}
+				if (problem instanceof ZDT2) {
+					problemName = "ZDT2_30";
+				}
+				if (problem instanceof ZDT3) {
+					problemName = "ZDT3_10";
+				}
+				if (problem instanceof ZDT4) {
+					problemName = "ZDT4_10";
+				}
+				if (problem instanceof ZDT6) {
+					problemName = "ZDT6_10";
+				}
+				if (problem instanceof WFG1) {
+					problemName = "WFG1_6";
+				}
+				if (problem instanceof WFG2) {
+					problemName = "WFG2_6";
+				}
+				if (problem instanceof WFG3) {
+					problemName = "WFG3_6";
+				}
+				if (problem instanceof WFG4) {
+					problemName = "WFG4_6";
+				}
+				if (problem instanceof WFG5) {
+					problemName = "WFG5_6";
+				}
+				if (problem instanceof WFG6) {
+					problemName = "WFG6_6";
+				}
+				if (problem instanceof WFG7) {
+					problemName = "WFG7_6";
+				}
+				if (problem instanceof WFG8) {
+					problemName = "WFG8_6";
+				}
+				if (problem instanceof WFG9) {
+					problemName = "WFG9_6";
+				}
+				if (problem instanceof LZ09_F1) {
+					problemName = "LZ09_F1_30";
+				}
+				if (problem instanceof LZ09_F2) {
+					problemName = "LZ09_F2_30";
+				}
+				if (problem instanceof LZ09_F3) {
+					problemName = "LZ09_F3_30";
+				}
+				if (problem instanceof LZ09_F4) {
+					problemName = "LZ09_F4_30";
+				}
+				if (problem instanceof LZ09_F5) {
+					problemName = "LZ09_F5_30";
+				}
+				if (problem instanceof LZ09_F6) {
+					problemName = "LZ09_F6_30";
+				}
+				if (problem instanceof LZ09_F7) {
+					problemName = "LZ09_F7_10";
+				}
+				if (problem instanceof LZ09_F8) {
+					problemName = "LZ09_F8_10";
+				}
+				if (problem instanceof LZ09_F9) {
+					problemName = "LZ09_F9_30";
+				}
+				if (problem instanceof Kursawe) {
+					problemName = "KSW_10";
+				}
+
+				Map<String, List<Double>> averageHvValues = new HashMap<String, List<Double>>();
+				Map<String, List<Double>> averageRankPerformance = new HashMap<String, List<Double>>();
+				Map<String, List<List<Double>>> indHvValues = new HashMap<String, List<List<Double>>>();
+
+				// Map<String, List<Double>> indHvPerformances = new
+				// HashMap<String,
+				// List<Double>>();
+
+				for (String ctc : classesToCompare) {
+					List<Double> averageHvConvergenceValues = computeAverageConvergenceCurve(ctc, problem, problemName,
+							metric);
+					List<List<Double>> individualHvConvergnceValues = extractIndividualConvergenceValues(ctc, problem,
+							problemName, metric);
+					// List<Double> individualThresholdPerformance =
+					// computeIndividualThresholdPerformance(ctc, problem,
+					// problemName, metric, metricThreshold);
+
+					averageHvValues.put(ctc, averageHvConvergenceValues);
+					indHvValues.put(ctc, individualHvConvergnceValues);
+					// indHvPerformances.put(ctc,
+					// individualThresholdPerformance);
+				}
+
+				System.out.println("FOR " + problemName + ":");
+
+				// perform the selected type of ranking comparison
+				if (rankingType.equals("1_basicRanking")) {
+					averageRankPerformance = computeAverageRankPerformanceBasic(classesToCompare, averageHvValues,
+							rankGranularity);
+				} else if (rankingType.equals("5_statisticalRanking")) {
+					averageRankPerformance = computeAverageRankPerformanceMannWhitneyU(classesToCompare,
+							averageHvValues, indHvValues, 0.025, rankGranularity);
+				} else if (rankingType.equals("2_pessimisticRanking_1Percent")) {
+					averageRankPerformance = computeAverageRankPerformancePessimistic(classesToCompare, averageHvValues,
+							rankGranularity, 1, 1.0, 99.0);
+				} else if (rankingType.equals("3_pessimisticRanking_5Percent")) {
+					averageRankPerformance = computeAverageRankPerformancePessimistic(classesToCompare, averageHvValues,
+							rankGranularity, 5, 1.0, 99.0);
+				} else if (rankingType.equals("4_pessimisticRanking_10Percent")) {
+					averageRankPerformance = computeAverageRankPerformancePessimistic(classesToCompare, averageHvValues,
+							rankGranularity, 10, 1.0, 99.0);
+				}
+
+				for (Map.Entry<String, List<Double>> entry : averageRankPerformance.entrySet()) {
+					String ctc = entry.getKey();
+					List<Double> values = entry.getValue();
+					Map<String, List<Double>> prmEntry = performanceRankMatrices.get(ctc);
+					prmEntry.put(problemName, values);
+				}
+				computeOverallConvergenceTrends(classesToCompare, averageHvValues, averageHvConvergenceTrends,
+						problemNo);
+
+				outputMetricResults(classesToCompare, averageHvValues, outputPath + "//2_AverageRuntimePerformance//",
 						problemName, metric);
-				List<Double> individualThresholdPerformance = computeIndividualThresholdPerformance(ctc, problem,
-						problemName, metric, metricThreshold);
+				// outputStatDetails(classesToCompare, indHvPerformances,
+				// resultPath, problemName, metric);
 
-				averageHvValues.put(ctc, averageHvConvergenceValues);
-				indHvValues.put(ctc, individualHvConvergnceValues);
-				indHvPerformances.put(ctc, individualThresholdPerformance);
+				System.out.println("Computation finished! - " + problemName);
 			}
 
-			System.out.println("FOR " + problemName + ":");
+			outputGlobalResults(classesToCompare, performanceRankMatrices,
+					outputPath + "//1_RankedPerformanceCurves//" + rankingType + "//", metric);
+			outputConvergenceTrendsResults(classesToCompare, outputPath + "//2_AverageRuntimePerformance//",
+					averageHvConvergenceTrends, metric);
 
-			// TODO select the type of comparison
-
-			// averageRankPerformance =
-			// computeAverageRankPerformanceMannWhitneyU(classesToCompare,
-			// averageHvValues,
-			// indHvValues, 0.025, rankGranularity);
-
-			averageRankPerformance = computeAverageRankPerformanceBasic(classesToCompare, averageHvValues,
-					rankGranularity);
-
-			// averageRankPerformance =
-			// computeAverageRankPerformancePessimistic(classesToCompare,
-			// averageHvValues,
-			// rankGranularity, 5, 1.0, 99.0);
-
-			for (Map.Entry<String, List<Double>> entry : averageRankPerformance.entrySet()) {
-				String ctc = entry.getKey();
-				List<Double> values = entry.getValue();
-				Map<String, List<Double>> prmEntry = performanceRankMatrices.get(ctc);
-				prmEntry.put(problemName, values);
-			}
-			computeOverallConvergenceTrends(classesToCompare, averageHvValues, averageHvConvergenceTrends, problemNo);
-
-			outputMetricResults(classesToCompare, averageHvValues, resultPath, problemName, metric);
-			// outputStatDetails(classesToCompare, indHvPerformances,
-			// resultPath, problemName, metric);
-
-			System.out.println("Computation finished! - " + problemName);
+			System.out.println("Computations finished for ranking type: " + rankingType);
 		}
-
-		outputGlobalResults(classesToCompare, performanceRankMatrices, resultPath, metric);
-		outputConvergenceTrendsResults(classesToCompare, resultPath, averageHvConvergenceTrends, metric);
-
 		System.out.println("All computations finished!");
 	}
 
 	private static void outputConvergenceTrendsResults(List<String> classesToCompare, String resultPath,
 			Map<String, List<Double>> averageHvConvergenceTrends, String metric) throws IOException {
 
-		String fileName = resultPath + "2_" + metric + "ComparisonAcrossAllProblems//Global" + metric + "RawValues"
-				+ ".csv";
+		String fileName = resultPath + "AcrossAllProblems//Global" + metric + ".csv";
 		File f = new File(fileName);
 		File dir = new File(f.getParent());
 		if (!dir.exists() && !dir.mkdirs()) {
@@ -874,10 +930,10 @@ public class ComparativeRuntimeEvaluator {
 	}
 
 	private static void outputGlobalResults(List<String> classesToCompare,
-			Map<String, Map<String, List<Double>>> performanceRankMatrices, String resultPath, String metric)
+			Map<String, Map<String, List<Double>>> performanceRankMatrices, String outputPath, String metric)
 					throws IOException {
 
-		String fileName = resultPath + "1_" + metric + "RankComparisonAcrossAllProblems" + "//" + "RankMatrices.csv";
+		String fileName = outputPath + metric + "_RankMatrices.csv";
 		File f = new File(fileName);
 		File dir = new File(f.getParent());
 		if (!dir.exists() && !dir.mkdirs()) {
@@ -949,9 +1005,9 @@ public class ComparativeRuntimeEvaluator {
 	}
 
 	private static void outputMetricResults(List<String> classesToCompare, Map<String, List<Double>> averageHvValues,
-			String resultPath, String problemName, String metric) throws IOException {
+			String outputPath, String problemName, String metric) throws IOException {
 
-		String fileName = resultPath + problemName + "//AverageComparative" + metric + ".csv";
+		String fileName = outputPath + problemName + "//Problem" + metric + ".csv";
 		File f = new File(fileName);
 		File dir = new File(f.getParent());
 		if (!dir.exists() && !dir.mkdirs()) {
@@ -1003,44 +1059,48 @@ public class ComparativeRuntimeEvaluator {
 		bw.close();
 	}
 
-	private static void outputStatDetails(List<String> classesToCompare, Map<String, List<Double>> indHvPerformances,
-			String resultPath, String problemName, String metric) throws IOException {
-		String fileName = resultPath + problemName + "//" + metric + "_Stats.csv";
-		File f = new File(fileName);
-		File dir = new File(f.getParent());
-		if (!dir.exists() && !dir.mkdirs()) {
-			throw new IOException("Could not create directory path: " + f.getParent());
-		}
-		if (!f.exists()) {
-			f.createNewFile();
-		}
-		BufferedWriter bw = new BufferedWriter(new FileWriter(fileName, false));
-
-		int maxCount = 0;
-		for (String ctc : classesToCompare) {
-			List<Double> values = indHvPerformances.get(ctc);
-			if (values.size() > maxCount) {
-				maxCount = values.size();
-			}
-		}
-
-		for (int i = 0; i < maxCount; i++) {
-			String s = "";
-			for (String ctc : classesToCompare) {
-				List<Double> values = indHvPerformances.get(ctc);
-				if (s.length() > 0) {
-					s += ",";
-				}
-				if (values.size() > i) {
-					double val = values.get(i);
-					s += val;
-				} else {
-					s += "-1.0";
-				}
-			}
-			bw.write(s + "\n");
-		}
-
-		bw.close();
-	}
+	// private static void outputStatDetails(List<String> classesToCompare,
+	// Map<String, List<Double>> indHvPerformances,
+	// String resultPath, String problemName, String metric) throws IOException
+	// {
+	// String fileName = resultPath + problemName + "//" + metric +
+	// "_Stats.csv";
+	// File f = new File(fileName);
+	// File dir = new File(f.getParent());
+	// if (!dir.exists() && !dir.mkdirs()) {
+	// throw new IOException("Could not create directory path: " +
+	// f.getParent());
+	// }
+	// if (!f.exists()) {
+	// f.createNewFile();
+	// }
+	// BufferedWriter bw = new BufferedWriter(new FileWriter(fileName, false));
+	//
+	// int maxCount = 0;
+	// for (String ctc : classesToCompare) {
+	// List<Double> values = indHvPerformances.get(ctc);
+	// if (values.size() > maxCount) {
+	// maxCount = values.size();
+	// }
+	// }
+	//
+	// for (int i = 0; i < maxCount; i++) {
+	// String s = "";
+	// for (String ctc : classesToCompare) {
+	// List<Double> values = indHvPerformances.get(ctc);
+	// if (s.length() > 0) {
+	// s += ",";
+	// }
+	// if (values.size() > i) {
+	// double val = values.get(i);
+	// s += val;
+	// } else {
+	// s += "-1.0";
+	// }
+	// }
+	// bw.write(s + "\n");
+	// }
+	//
+	// bw.close();
+	// }
 }

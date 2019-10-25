@@ -186,7 +186,7 @@ public class NSGAII_main_VerCZ {
 		/** ZDT5 is not real-valued */
 		problemsToSolve.add(new ZDT6("Real"));
 
-		int algRepeats = 50;
+		int algRepeats = 1;
 
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {

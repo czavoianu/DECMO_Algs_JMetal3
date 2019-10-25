@@ -106,7 +106,7 @@ public class DECMO_main_VerCZ {
 		 * number of times each problem should be solved (i.e., independent
 		 * algorithm iterations)
 		 */
-		int algRepeats = 50;
+		int algRepeats = 1;
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {
 				algorithm = new DECMO_VerCZ(problem);

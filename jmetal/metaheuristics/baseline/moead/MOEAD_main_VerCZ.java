@@ -98,9 +98,9 @@ public class MOEAD_main_VerCZ {
 		problemsToSolve.add(new DTLZ5("Real")); // 3obj
 		problemsToSolve.add(new DTLZ6("Real")); // 3obj
 		problemsToSolve.add(new DTLZ7("Real")); // 3obj
-		// /** 1 benchmark problem based on Kursawe's function */
+		/** 1 benchmark problem based on Kursawe's function */
 		problemsToSolve.add(new Kursawe("Real", 10)); // 2obj
-		// /** 9 LZ09 benchmark problems */
+		/** 9 LZ09 benchmark problems */
 		problemsToSolve.add(new LZ09_F1("Real")); // 2obj
 		problemsToSolve.add(new LZ09_F2("Real")); // 2obj
 		problemsToSolve.add(new LZ09_F3("Real")); // 2obj
@@ -110,7 +110,7 @@ public class MOEAD_main_VerCZ {
 		problemsToSolve.add(new LZ09_F7("Real")); // 2obj
 		problemsToSolve.add(new LZ09_F8("Real")); // 2obj
 		problemsToSolve.add(new LZ09_F9("Real")); // 2obj
-		// /** 9 WFG benchmark problems */
+		/** 9 WFG benchmark problems */
 		problemsToSolve.add(new WFG1("Real")); // 2obj
 		problemsToSolve.add(new WFG2("Real")); // 2obj
 		problemsToSolve.add(new WFG3("Real")); // 2obj
@@ -120,7 +120,7 @@ public class MOEAD_main_VerCZ {
 		problemsToSolve.add(new WFG7("Real")); // 2obj
 		problemsToSolve.add(new WFG8("Real")); // 2obj
 		problemsToSolve.add(new WFG9("Real")); // 2obj
-		// /** 5 ZDT benchmark problems */
+		/** 5 ZDT benchmark problems */
 		problemsToSolve.add(new ZDT1("Real", 30)); // 2obj
 		problemsToSolve.add(new ZDT2("Real", 30)); // 2obj
 		problemsToSolve.add(new ZDT3("Real", 10)); // 2obj
@@ -128,7 +128,7 @@ public class MOEAD_main_VerCZ {
 		/** ZDT5 is not real-valued */
 		problemsToSolve.add(new ZDT6("Real")); // 2obj
 
-		int algRepeats = 1;
+		int algRepeats = 100;
 
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {
@@ -140,7 +140,7 @@ public class MOEAD_main_VerCZ {
 				// lit. recommendation for 2 objectives
 				// algorithm.setInputParameter("populationSize", 300);
 				// lit. recommendation for 3 objectives is 595
-				algorithm.setInputParameter("populationSize", 300);
+				algorithm.setInputParameter("populationSize", 700);
 				algorithm.setInputParameter("reportInterval", 100);
 				algorithm.setInputParameter("maxEvaluations", 50000);
 
