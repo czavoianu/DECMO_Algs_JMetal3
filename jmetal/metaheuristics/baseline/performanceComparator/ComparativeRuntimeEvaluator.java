@@ -609,7 +609,7 @@ public class ComparativeRuntimeEvaluator {
 		 * "DECMOFamily" = comparison between the three DECMO variants and
 		 * "DECMO2vsNSGA2" = comparison between the DECMO2 and NSGA2 solvers
 		 */
-		String nameOfAnalysis = "MOEAD_DRA_DiffPopSizes";
+		String nameOfAnalysis = "allAlgorithms";
 
 		/**
 		 * Type of rankings to use when building the Hypervolume-Ranked
@@ -625,20 +625,26 @@ public class ComparativeRuntimeEvaluator {
 		 * Result paths to include in comparison, i.e., algorithms to include in
 		 * the comparison
 		 */
-		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize200//");
-		// classesToCompare.add("data//output//runtimePerformance//NSGA2//SolutionSetSize200//");
-		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize200//");
-		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSizeLitRecom//");
-		// classesToCompare.add("data//output//runtimePerformance//DECMO//SolutionSetSize200//");
-		// classesToCompare.add("data//output//runtimePerformance//DECMO2//SolutionSetSize200//");
-		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize200//");
 
-		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize100//");
-		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize200//");
-		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize300//");
-		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize400//");
-		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize500//");
-		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize595//");
+		classesToCompare.add("data//output//runtimePerformance//DECMO//SolutionSetSize200//");
+		classesToCompare.add("data//output//runtimePerformance//DECMO2//SolutionSetSize200//");
+		classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize200//");
+
+		classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize200//");
+		classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize200//");
+		classesToCompare.add("data//output//runtimePerformance//NSGA2//SolutionSetSize200//");
+		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSizeLitRecom//");
+
+		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize100//");
+		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize200//");
+		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize300//");
+		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize400//");
+		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize500//");
+		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize595//");
+		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize700//");
+		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize800//");
+		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize900//");
+		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize1000//");
 
 		/** Benchmark problems to include in the comparison */
 		problemsToUseInComparison.add(new DTLZ1("Real")); // 1

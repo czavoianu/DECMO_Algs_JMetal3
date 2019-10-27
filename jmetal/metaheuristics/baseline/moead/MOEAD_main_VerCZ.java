@@ -128,7 +128,7 @@ public class MOEAD_main_VerCZ {
 		/** ZDT5 is not real-valued */
 		problemsToSolve.add(new ZDT6("Real")); // 2obj
 
-		int algRepeats = 100;
+		int algRepeats = 1;
 
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {
@@ -140,7 +140,7 @@ public class MOEAD_main_VerCZ {
 				// lit. recommendation for 2 objectives
 				// algorithm.setInputParameter("populationSize", 300);
 				// lit. recommendation for 3 objectives is 595
-				algorithm.setInputParameter("populationSize", 700);
+				algorithm.setInputParameter("populationSize", 500);
 				algorithm.setInputParameter("reportInterval", 100);
 				algorithm.setInputParameter("maxEvaluations", 50000);
 

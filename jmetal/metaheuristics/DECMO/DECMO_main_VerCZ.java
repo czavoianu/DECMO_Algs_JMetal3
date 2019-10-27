@@ -116,7 +116,7 @@ public class DECMO_main_VerCZ {
 				 * The size of each subpopulation. The total population size is
 				 * double the subpopulation size
 				 */
-				algorithm.setInputParameter("individualPopulationSize", 100);
+				algorithm.setInputParameter("individualPopulationSize", 600);
 				/** The number of iterations (i.e., generations) */
 				algorithm.setInputParameter("maxIterations", 250);
 				/**
