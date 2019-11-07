@@ -122,7 +122,7 @@ public class SPEA2_main_VerCZ {
 		problemsToSolve.add(new WFG7("Real"));
 		problemsToSolve.add(new WFG8("Real"));
 		problemsToSolve.add(new WFG9("Real"));
-		// /** 5 ZDT benchmark problems */
+		/** 5 ZDT benchmark problems */
 		problemsToSolve.add(new ZDT1("Real", 30));
 		problemsToSolve.add(new ZDT2("Real", 30));
 		problemsToSolve.add(new ZDT3("Real", 10));

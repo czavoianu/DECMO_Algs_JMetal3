@@ -107,7 +107,6 @@ public class DECMO2_main_VerCZ {
 		 * algorithm iterations)
 		 */
 		int algRepeats = 1;
-
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {
 				algorithm = new DECMO2_VerCZ(problem);

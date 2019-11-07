@@ -116,9 +116,12 @@ public class DECMO_main_VerCZ {
 				 * The size of each subpopulation. The total population size is
 				 * double the subpopulation size
 				 */
-				algorithm.setInputParameter("individualPopulationSize", 600);
-				/** The number of iterations (i.e., generations) */
-				algorithm.setInputParameter("maxIterations", 250);
+				algorithm.setInputParameter("individualPopulationSize", 100);
+				/**
+				 * The number of fitness evaluations to be performed during the
+				 * optimization
+				 */
+				algorithm.setInputParameter("maxEvaluations", 50000);
 				/**
 				 * After how many new individuals is algorithm progress (i.e.,
 				 * hypervolume) computed. In total the algorithm will evaluate

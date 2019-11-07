@@ -140,7 +140,7 @@ public class MOEAD_main_VerCZ {
 				// lit. recommendation for 2 objectives
 				// algorithm.setInputParameter("populationSize", 300);
 				// lit. recommendation for 3 objectives is 595
-				algorithm.setInputParameter("populationSize", 500);
+				algorithm.setInputParameter("populationSize", 300);
 				algorithm.setInputParameter("reportInterval", 100);
 				algorithm.setInputParameter("maxEvaluations", 50000);
 

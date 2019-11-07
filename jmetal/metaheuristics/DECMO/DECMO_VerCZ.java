@@ -91,7 +91,7 @@ public class DECMO_VerCZ extends Algorithm {
 	@Override
 	public SolutionSet execute() throws JMException, ClassNotFoundException {
 		int populationSize;
-		int maxIterations;
+		int maxEvaluations;
 		int evaluations;
 		int iterations;
 
@@ -113,7 +113,7 @@ public class DECMO_VerCZ extends Algorithm {
 
 		// Read the DECMO parameters
 		populationSize = ((Integer) this.getInputParameter("individualPopulationSize")).intValue();
-		maxIterations = ((Integer) this.getInputParameter("maxIterations")).intValue();
+		maxEvaluations = ((Integer) this.getInputParameter("maxEvaluations")).intValue();
 		reportInterval = ((Integer) getInputParameter("reportInterval")).intValue();
 
 		/** Fixed fitness sharing interval */
@@ -276,7 +276,7 @@ public class DECMO_VerCZ extends Algorithm {
 		boolean initialPopulation = true;
 
 		// The main evolutionary cycle
-		while (iterations < maxIterations) {
+		while (evaluations < maxEvaluations) {
 			SolutionSet combi = new SolutionSet();
 			if (!initialPopulation) {
 				offspringPop1 = new SolutionSet(pool1Size * 3);
