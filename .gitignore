@@ -26,3 +26,4 @@ hs_err_pid*
 # jMetal execution outcome files
 FUN
 VAR
+.classpath
