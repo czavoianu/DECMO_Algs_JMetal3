@@ -28,8 +28,4 @@ FUN
 VAR
 
 # MO-ICOPs PPSN datafiles
-data/output/runtimePerformance/DECMO2++/SolutionSetSize200/MO_ICOP_Cummulative/
-data/output/runtimePerformance/GDE3/SolutionSetSize200/MO_ICOP_Cummulative/
-data/output/runtimePerformance/NSGA2/SolutionSetSize200/MO_ICOP_Cummulative/
-data/output/runtimePerformance/MOEAD_DRA/SolutionSetSize300/MO_ICOP_Cummulative/
-data/output/runtimePerformance/comparativePerformance/MOEAD_DRA_DiffSolSetSizes/
+data/output/runtimePerformance/
