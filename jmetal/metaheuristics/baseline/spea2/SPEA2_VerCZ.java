@@ -35,6 +35,7 @@ import jmetal.problems.LZ09.LZ09_F6;
 import jmetal.problems.LZ09.LZ09_F7;
 import jmetal.problems.LZ09.LZ09_F8;
 import jmetal.problems.LZ09.LZ09_F9;
+import jmetal.problems.MO_ICOP.ICOP;
 import jmetal.problems.WFG.WFG1;
 import jmetal.problems.WFG.WFG2;
 import jmetal.problems.WFG.WFG3;
@@ -70,6 +71,8 @@ public class SPEA2_VerCZ extends Algorithm {
 	public static final int TOURNAMENTS_ROUNDS = 1;
 
 	private String PROBLEM_NAME = "Problem";
+
+	final static String UNKNOWN_PF = "UNKNOWN_PF";
 
 	/**
 	 * Stores the problem to solve
@@ -205,6 +208,10 @@ public class SPEA2_VerCZ extends Algorithm {
 			PROBLEM_NAME = "KSW_10";
 		}
 
+		if (problem_ instanceof ICOP) {
+			PROBLEM_NAME = UNKNOWN_PF;
+		}
+
 		// Read the operators
 		crossoverOperator = operators_.get("crossover");
 		mutationOperator = operators_.get("mutation");
@@ -225,16 +232,23 @@ public class SPEA2_VerCZ extends Algorithm {
 			solutionSet.add(newSolution);
 		}
 
-		QualityIndicator indicator = new QualityIndicator(problem_,
-				"data\\input\\trueParetoFronts\\" + PROBLEM_NAME + ".pareto");
+		QualityIndicator indicator = null;
+		if (!PROBLEM_NAME.equals(UNKNOWN_PF)) {
+			indicator = new QualityIndicator(problem_, "data\\input\\trueParetoFronts\\" + PROBLEM_NAME + ".pareto");
+		}
 
 		/** record the generational HV of the initial population */
 		int cGen = evaluations / reportInterval;
 		if (cGen > 0) {
 
-			double hVal = indicator.getHypervolume(solutionSet);
-			hVal = indicator.getHypervolume(solutionSet);
-			System.out.println("Hypervolume: " + (evaluations / 100) + " - " + hVal);
+			double hVal = -1.0;
+			if (indicator != null) {
+				hVal = indicator.getHypervolume(solutionSet);
+			}
+			if (!(problem_ instanceof ICOP)) {
+				System.out.println("Hypervolume: " + (evaluations / 100) + " - " + hVal);
+			}
+
 			for (int i = 0; i < cGen; i++) {
 				generationalHV.add(hVal);
 			}
@@ -272,9 +286,13 @@ public class SPEA2_VerCZ extends Algorithm {
 
 				int newGen = evaluations / reportInterval;
 				if (newGen > currentGen) {
-					double hVal = indicator.getHypervolume(archive);
-					hVal = indicator.getHypervolume(archive);
-					System.out.println("Hypervolume: " + (evaluations / 100) + " - " + hVal);
+
+					double hVal = -1.0;
+					if (indicator != null) {
+						hVal = indicator.getHypervolume(archive);
+						System.out.println("Hypervolume: " + (evaluations / 100) + " - " + hVal);
+					}
+
 					for (int i = currentGen; i < newGen; i++) {
 						generationalHV.add(hVal);
 					}
@@ -286,26 +304,28 @@ public class SPEA2_VerCZ extends Algorithm {
 		} // while
 
 		// write generationalHV to file
-		String sGenHV = "";
-		for (Double d : generationalHV) {
-			sGenHV += d + ",";
-		}
+		if (!(problem_ instanceof ICOP)) {
+			String sGenHV = "";
+			for (Double d : generationalHV) {
+				sGenHV += d + ",";
+			}
 
-		try {
-			File hvFile = new File("data\\output\\runtimePerformance\\SPEA2\\SolutionSetSize" + populationSize + "\\"
-					+ PROBLEM_NAME + "\\HV.csv");
-			File dir = new File(hvFile.getParent());
-			if (!dir.exists() && !dir.mkdirs()) {
-				System.out.println("Could not create directory path: ");
+			try {
+				File hvFile = new File("data\\output\\runtimePerformance\\SPEA2\\SolutionSetSize" + populationSize
+						+ "\\" + PROBLEM_NAME + "\\HV.csv");
+				File dir = new File(hvFile.getParent());
+				if (!dir.exists() && !dir.mkdirs()) {
+					System.out.println("Could not create directory path: ");
+				}
+				if (!hvFile.exists()) {
+					hvFile.createNewFile();
+				}
+				BufferedWriter bw = new BufferedWriter(new FileWriter(hvFile, true));
+				bw.write(sGenHV + "\n");
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			if (!hvFile.exists()) {
-				hvFile.createNewFile();
-			}
-			BufferedWriter bw = new BufferedWriter(new FileWriter(hvFile, true));
-			bw.write(sGenHV + "\n");
-			bw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
 		Ranking ranking = new Ranking(archive);

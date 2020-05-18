@@ -38,6 +38,7 @@ import jmetal.problems.LZ09.LZ09_F6;
 import jmetal.problems.LZ09.LZ09_F7;
 import jmetal.problems.LZ09.LZ09_F8;
 import jmetal.problems.LZ09.LZ09_F9;
+import jmetal.problems.MO_ICOP.ICOP;
 import jmetal.problems.WFG.WFG1;
 import jmetal.problems.WFG.WFG2;
 import jmetal.problems.WFG.WFG3;
@@ -57,15 +58,27 @@ import jsc.independentsamples.MannWhitneyTest;
 
 public class ComparativeRuntimeEvaluator {
 
+	private static final boolean awardRankBonusAndPenalty = false;
+	private static final double RankBonusValue = 0.0;
+
 	private static List<Double> computeAverageConvergenceCurve(String ctc, Problem problem, String problemName,
-			String metric) throws IOException {
+			String metric, boolean normalizeValues) throws IOException {
 		List<Double> result = new ArrayList<Double>();
 		String fileName = ctc + problemName + "//" + metric + ".csv";
 		BufferedReader br = new BufferedReader(new FileReader(fileName));
 		String line;
 		int testCount = 0;
-		QualityIndicator indicator = new QualityIndicator(problem,
-				"data\\input\\trueParetoFronts\\" + problemName + ".pareto");
+
+		QualityIndicator indicator = null;
+		if (!(problem instanceof ICOP)) {
+			indicator = new QualityIndicator(problem, "data\\input\\trueParetoFronts\\" + problemName + ".pareto");
+		} else {
+			if (normalizeValues) {
+				indicator = new QualityIndicator(problem,
+						"jmetal\\problems\\MO_ICOP\\bestKnownParetoFronts\\" + "d" + ((ICOP) problem).getDimension()
+								+ "_p" + ((ICOP) problem).getProblemID() + "_k" + ((ICOP) problem).getK() + ".csv");
+			}
+		}
 
 		while ((line = br.readLine()) != null) {
 			String[] lineTokens = line.split("\\,");
@@ -81,7 +94,11 @@ public class ComparativeRuntimeEvaluator {
 				for (int i = 0; i < lineTokens.length; i++) {
 					double val = Double.parseDouble(lineTokens[i]);
 					if (!Double.isNaN(val)) {
-						result.set(j, result.get(j) + (val / indicator.getTrueParetoFrontHypervolume()));
+						if (normalizeValues) {
+							result.set(j, result.get(j) + (val / indicator.getTrueParetoFrontHypervolume()));
+						} else {
+							result.set(j, result.get(j) + (val));
+						}
 						j++;
 					}
 				}
@@ -151,10 +168,12 @@ public class ComparativeRuntimeEvaluator {
 			for (Map.Entry<Double, String> entry : sortingMap.entrySet()) {
 				double newValue = 1.0 * rank;
 
-				if (entry.getKey() > 99.0) {
-					newValue = 0.0;
-				} else if (entry.getKey() < 1.0) {
-					newValue = 1.0 * (classesToCompare.size() + 1);
+				if (awardRankBonusAndPenalty) {
+					if (entry.getKey() > 99.0) {
+						newValue = RankBonusValue;
+					} else if (entry.getKey() < 1.0) {
+						newValue = 1.0 * (classesToCompare.size() + 1);
+					}
 				}
 
 				rawVals.put(entry.getValue(), newValue);
@@ -252,11 +271,14 @@ public class ComparativeRuntimeEvaluator {
 					avg += d;
 				avg /= newHvIndValuesArray.length;
 				// System.out.println(avg);
-				if (avg > 99.0) {
-					newValue = 0.0;
-				}
-				if (avg < 1.0) {
-					newValue = 1.0 * (classesToCompare.size() + 1);
+
+				if (awardRankBonusAndPenalty) {
+					if (avg > 99.0) {
+						newValue = RankBonusValue;
+					}
+					if (avg < 1.0) {
+						newValue = 1.0 * (classesToCompare.size() + 1);
+					}
 				}
 
 				// System.out.println(entry.getValue() + " " + newValue);
@@ -439,9 +461,17 @@ public class ComparativeRuntimeEvaluator {
 				double newValue = 1.0 * rank;
 
 				if (entry.getKey() > maxVal) {
-					newValue = 0.0;
+					if (awardRankBonusAndPenalty) {
+						newValue = RankBonusValue;
+					} else {
+						newValue = 1.0 * rank;
+					}
 				} else if (entry.getKey() < minVal) {
-					newValue = 1.0 * (classesToCompare.size() + 1);
+					if (awardRankBonusAndPenalty) {
+						newValue = 1.0 * (classesToCompare.size() + 1);
+					} else {
+						newValue = 1.0 * rank;
+					}
 				} else if (j != 0) {
 					if ((entry.getKey() - relevanceFactor) < lastHVVal) {
 						newValue = 1.0 * rank;
@@ -551,14 +581,23 @@ public class ComparativeRuntimeEvaluator {
 	}
 
 	private static List<List<Double>> extractIndividualConvergenceValues(String ctc, Problem problem,
-			String problemName, String metric) throws IOException {
+			String problemName, String metric, boolean normalizeValues) throws IOException {
 		List<List<Double>> result = new ArrayList<List<Double>>();
 		int dataPointsCount = 0;
 		String fileName = ctc + problemName + "//" + metric + ".csv";
 		BufferedReader br = new BufferedReader(new FileReader(fileName));
 		String line;
-		QualityIndicator indicator = new QualityIndicator(problem,
-				"data\\input\\trueParetoFronts\\" + problemName + ".pareto");
+
+		QualityIndicator indicator = null;
+		if (!(problem instanceof ICOP)) {
+			indicator = new QualityIndicator(problem, "data\\input\\trueParetoFronts\\" + problemName + ".pareto");
+		} else {
+			if (normalizeValues) {
+				indicator = new QualityIndicator(problem,
+						"jmetal\\problems\\MO_ICOP\\bestKnownParetoFronts\\" + "d" + ((ICOP) problem).getDimension()
+								+ "_p" + ((ICOP) problem).getProblemID() + "_k" + ((ICOP) problem).getK() + ".csv");
+			}
+		}
 
 		while ((line = br.readLine()) != null) {
 			String[] lineTokens = line.split("\\,");
@@ -576,7 +615,12 @@ public class ComparativeRuntimeEvaluator {
 				for (int i = 0; i < lineTokens.length; i++) {
 					double val = Double.parseDouble(lineTokens[i]);
 					if (!Double.isNaN(val)) {
-						double value = (val / indicator.getTrueParetoFrontHypervolume()) * 100;
+						double value = 0.0;
+						if (normalizeValues) {
+							value = (val / indicator.getTrueParetoFrontHypervolume()) * 100;
+						} else {
+							value = val * 100;
+						}
 						if (value > 100.0) {
 							value = 100.0;
 						}
@@ -610,7 +654,7 @@ public class ComparativeRuntimeEvaluator {
 		 * "DECMO2vsNSGA2" = comparison between the DECMO2 and NSGA2 solvers
 		 */
 		// String nameOfAnalysis = "allAlgorithms_SmallPopSize";
-		String nameOfAnalysis = "allAlgorithms";
+		String nameOfAnalysis = "MO_ICOP_comparative";
 
 		/**
 		 * Type of rankings to use when building the Hypervolume-Ranked
@@ -629,35 +673,35 @@ public class ComparativeRuntimeEvaluator {
 
 		// classesToCompare.add("data//output//runtimePerformance//DECMO//SolutionSetSize50//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO//SolutionSetSize100//");
-		classesToCompare.add("data//output//runtimePerformance//DECMO//SolutionSetSize200//");
+		// classesToCompare.add("data//output//runtimePerformance//DECMO//SolutionSetSize200//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO//SolutionSetSize300//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO//SolutionSetSize400//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO//SolutionSetSize500//");
 
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2//SolutionSetSize50//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2//SolutionSetSize100//");
-		classesToCompare.add("data//output//runtimePerformance//DECMO2//SolutionSetSize200//");
+		// classesToCompare.add("data//output//runtimePerformance//DECMO2//SolutionSetSize200//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2//SolutionSetSize300//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2//SolutionSetSize400//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2//SolutionSetSize500//");
 
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize50//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize100//");
-		classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize200//");
+		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize200//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize300//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize400//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize500//");
 
 		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize50//");
 		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize100//");
-		classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize200//");
+		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize200//");
 		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize300//");
 		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize400//");
 		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize500//");
 
 		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize50//");
 		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize100//");
-		classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize200//");
+		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize200//");
 		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize300//");
 		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize400//");
 		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize500//");
@@ -669,11 +713,11 @@ public class ComparativeRuntimeEvaluator {
 		// classesToCompare.add("data//output//runtimePerformance//NSGA2//SolutionSetSize400//");
 		// classesToCompare.add("data//output//runtimePerformance//NSGA2//SolutionSetSize500//");
 
-		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSizeLitRecom//");
+		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSizeLitRecom//");
 		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize50//");
 		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize100//");
 		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize200//");
-		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize300//");
+		classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize300//");
 		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize400//");
 		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize500//");
 		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize595//");
@@ -683,37 +727,46 @@ public class ComparativeRuntimeEvaluator {
 		// classesToCompare.add("data//output//runtimePerformance//MOEAD_DRA//SolutionSetSize1000//");
 
 		/** Benchmark problems to include in the comparison */
-		problemsToUseInComparison.add(new DTLZ1("Real")); // 1
-		problemsToUseInComparison.add(new DTLZ2("Real")); // 2
-		problemsToUseInComparison.add(new DTLZ3("Real")); // 3
-		problemsToUseInComparison.add(new DTLZ4("Real")); // 4
-		problemsToUseInComparison.add(new DTLZ5("Real")); // 5
-		problemsToUseInComparison.add(new DTLZ6("Real")); // 6
-		problemsToUseInComparison.add(new DTLZ7("Real")); // 7
-		problemsToUseInComparison.add(new Kursawe("Real", 10)); // 8
-		problemsToUseInComparison.add(new LZ09_F1("Real")); // 9
-		problemsToUseInComparison.add(new LZ09_F2("Real")); // 10
-		problemsToUseInComparison.add(new LZ09_F3("Real")); // 11
-		problemsToUseInComparison.add(new LZ09_F4("Real")); // 12
-		problemsToUseInComparison.add(new LZ09_F5("Real")); // 13
-		problemsToUseInComparison.add(new LZ09_F6("Real")); // 14
-		problemsToUseInComparison.add(new LZ09_F7("Real")); // 15
-		problemsToUseInComparison.add(new LZ09_F8("Real")); // 16
-		problemsToUseInComparison.add(new LZ09_F9("Real")); // 17
-		problemsToUseInComparison.add(new WFG1("Real")); // 18
-		problemsToUseInComparison.add(new WFG2("Real")); // 19
-		problemsToUseInComparison.add(new WFG3("Real")); // 20
-		problemsToUseInComparison.add(new WFG4("Real")); // 21
-		problemsToUseInComparison.add(new WFG5("Real")); // 22
-		problemsToUseInComparison.add(new WFG6("Real")); // 23
-		problemsToUseInComparison.add(new WFG7("Real")); // 24
-		problemsToUseInComparison.add(new WFG8("Real")); // 25
-		problemsToUseInComparison.add(new WFG9("Real")); // 26
-		problemsToUseInComparison.add(new ZDT1("Real", 30)); // 27
-		problemsToUseInComparison.add(new ZDT2("Real", 30)); // 28
-		problemsToUseInComparison.add(new ZDT3("Real", 10)); // 29
-		problemsToUseInComparison.add(new ZDT4("Real", 10)); // 30
-		problemsToUseInComparison.add(new ZDT6("Real", 10)); // 31
+		// problemsToUseInComparison.add(new DTLZ1("Real")); // 1
+		// problemsToUseInComparison.add(new DTLZ2("Real")); // 2
+		// problemsToUseInComparison.add(new DTLZ3("Real")); // 3
+		// problemsToUseInComparison.add(new DTLZ4("Real")); // 4
+		// problemsToUseInComparison.add(new DTLZ5("Real")); // 5
+		// problemsToUseInComparison.add(new DTLZ6("Real")); // 6
+		// problemsToUseInComparison.add(new DTLZ7("Real")); // 7
+		// problemsToUseInComparison.add(new Kursawe("Real", 10)); // 8
+		// problemsToUseInComparison.add(new LZ09_F1("Real")); // 9
+		// problemsToUseInComparison.add(new LZ09_F2("Real")); // 10
+		// problemsToUseInComparison.add(new LZ09_F3("Real")); // 11
+		// problemsToUseInComparison.add(new LZ09_F4("Real")); // 12
+		// problemsToUseInComparison.add(new LZ09_F5("Real")); // 13
+		// problemsToUseInComparison.add(new LZ09_F6("Real")); // 14
+		// problemsToUseInComparison.add(new LZ09_F7("Real")); // 15
+		// problemsToUseInComparison.add(new LZ09_F8("Real")); // 16
+		// problemsToUseInComparison.add(new LZ09_F9("Real")); // 17
+		// problemsToUseInComparison.add(new WFG1("Real")); // 18
+		// problemsToUseInComparison.add(new WFG2("Real")); // 19
+		// problemsToUseInComparison.add(new WFG3("Real")); // 20
+		// problemsToUseInComparison.add(new WFG4("Real")); // 21
+		// problemsToUseInComparison.add(new WFG5("Real")); // 22
+		// problemsToUseInComparison.add(new WFG6("Real")); // 23
+		// problemsToUseInComparison.add(new WFG7("Real")); // 24
+		// problemsToUseInComparison.add(new WFG8("Real")); // 25
+		// problemsToUseInComparison.add(new WFG9("Real")); // 26
+		// problemsToUseInComparison.add(new ZDT1("Real", 30)); // 27
+		// problemsToUseInComparison.add(new ZDT2("Real", 30)); // 28
+		// problemsToUseInComparison.add(new ZDT3("Real", 10)); // 29
+		// problemsToUseInComparison.add(new ZDT4("Real", 10)); // 30
+		// problemsToUseInComparison.add(new ZDT6("Real", 10)); // 31
+
+		int[] dimensions = { 30 };
+		for (int problemID = 1; problemID <= 50; problemID++) {
+			for (int k = 1; k <= 1; k++) {
+				for (int d = 0; d < dimensions.length; d++) {
+					problemsToUseInComparison.add(new ICOP("Real", problemID, dimensions[d], k, false, 2));
+				}
+			}
+		}
 
 		for (String rankingType : rankingTypeToConstruct) {
 
@@ -730,6 +783,12 @@ public class ComparativeRuntimeEvaluator {
 			 */
 			int rankGranularity = 10;
 			String problemName = "Problem";
+
+			/**
+			 * Should the raw indicator values used for performance comparison
+			 * be normalized?
+			 */
+			boolean normalizeRawIndicatorValues = false;
 
 			for (String ctc : classesToCompare) {
 				performanceRankMatrices.put(ctc, new TreeMap<String, List<Double>>());
@@ -835,6 +894,11 @@ public class ComparativeRuntimeEvaluator {
 					problemName = "KSW_10";
 				}
 
+				if (problem instanceof ICOP) {
+					problemName = "MO_ICOP_Cummulative\\" + "d" + ((ICOP) problem).getDimension() + "_p"
+							+ ((ICOP) problem).getProblemID() + "_k" + ((ICOP) problem).getK();
+				}
+
 				Map<String, List<Double>> averageHvValues = new HashMap<String, List<Double>>();
 				Map<String, List<Double>> averageRankPerformance = new HashMap<String, List<Double>>();
 				Map<String, List<List<Double>>> indHvValues = new HashMap<String, List<List<Double>>>();
@@ -845,9 +909,9 @@ public class ComparativeRuntimeEvaluator {
 
 				for (String ctc : classesToCompare) {
 					List<Double> averageHvConvergenceValues = computeAverageConvergenceCurve(ctc, problem, problemName,
-							metric);
+							metric, normalizeRawIndicatorValues);
 					List<List<Double>> individualHvConvergnceValues = extractIndividualConvergenceValues(ctc, problem,
-							problemName, metric);
+							problemName, metric, normalizeRawIndicatorValues);
 					// List<Double> individualThresholdPerformance =
 					// computeIndividualThresholdPerformance(ctc, problem,
 					// problemName, metric, metricThreshold);
@@ -1033,14 +1097,44 @@ public class ComparativeRuntimeEvaluator {
 			rhCurves.put(rhCurveName, rhCurveValues);
 		}
 
+		List<String> lines = new ArrayList<String>();
+		lines.add("");
 		bw.write("\n");
 		bw.write("\n");
 		for (Map.Entry<String, List<Double>> entry : rhCurves.entrySet()) {
 			String s = entry.getKey();
+			lines.set(0, lines.get(0) + "," + s);
+			int i = 1;
 			for (Double value : entry.getValue()) {
 				s += ", " + value;
+
+				if (lines.size() <= i) {
+					lines.add("" + i);
+				}
+				lines.set(i, lines.get(i) + "," + value);
+				i++;
 			}
 			bw.write(s + "\n");
+		}
+
+		bw.close();
+
+		// TODO write files
+
+		fileName = outputPath + "Ranks.csv";
+		f = new File(fileName);
+		dir = new File(f.getParent());
+		if (!dir.exists() && !dir.mkdirs()) {
+			throw new IOException("Could not create directory path: " + f.getParent());
+		}
+		if (!f.exists()) {
+			f.createNewFile();
+		}
+		bw = new BufferedWriter(new FileWriter(fileName, false));
+
+		int i = 0;
+		for (String line : lines) {
+			bw.write(line + "\n");
 		}
 
 		bw.close();

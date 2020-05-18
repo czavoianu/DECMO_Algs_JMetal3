@@ -45,6 +45,7 @@ import jmetal.problems.LZ09.LZ09_F6;
 import jmetal.problems.LZ09.LZ09_F7;
 import jmetal.problems.LZ09.LZ09_F8;
 import jmetal.problems.LZ09.LZ09_F9;
+import jmetal.problems.MO_ICOP.ICOP;
 import jmetal.problems.WFG.WFG1;
 import jmetal.problems.WFG.WFG2;
 import jmetal.problems.WFG.WFG3;
@@ -66,6 +67,8 @@ import jmetal.util.PseudoRandom;
 public class MOEAD_DRA_VerCZ extends Algorithm {
 
 	private String PROBLEM_NAME = "Problem";
+
+	final static String UNKNOWN_PF = "UNKNOWN_PF";
 
 	private final Problem problem_;
 	/**
@@ -259,8 +262,20 @@ public class MOEAD_DRA_VerCZ extends Algorithm {
 			PROBLEM_NAME = "KSW_10";
 		}
 
-		QualityIndicator indicator = new QualityIndicator(problem_,
-				"data\\input\\trueParetoFronts\\" + PROBLEM_NAME + ".pareto");
+		if (problem_ instanceof ICOP) {
+			PROBLEM_NAME = UNKNOWN_PF;
+		}
+
+		QualityIndicator indicator = null;
+		if (!PROBLEM_NAME.equals(UNKNOWN_PF)) {
+			indicator = new QualityIndicator(problem_, "data\\input\\trueParetoFronts\\" + PROBLEM_NAME + ".pareto");
+		} else {
+			if (!((ICOP) problem_).isVerbose()) {
+				indicator = new QualityIndicator(problem_,
+						"jmetal\\problems\\MO_ICOP\\bestKnownParetoFronts\\" + "d" + ((ICOP) problem_).getDimension()
+								+ "_p" + ((ICOP) problem_).getProblemID() + "_k" + ((ICOP) problem_).getK() + ".csv");
+			}
+		}
 
 		population_ = new SolutionSet(populationSize_);
 		savedValues_ = new Solution[populationSize_];
@@ -301,15 +316,20 @@ public class MOEAD_DRA_VerCZ extends Algorithm {
 		/** record the generational HV of the initial population */
 		int cGen = evaluations_ / reportInterval;
 		if (cGen > 0) {
-			double hVal = indicator.getHypervolume(population_);
-			hVal = indicator.getHypervolume(population_);
-			System.out.println("Hypervolume: " + (evaluations_ / 100) + " - " + hVal);
+			double hVal = -1.0;
+			if (indicator != null) {
+				hVal = indicator.getHypervolume(population_);
+				System.out.println("Hypervolume: " + (evaluations_ / 100) + " - " + hVal);
+			}
+
 			for (int i = 0; i < cGen; i++) {
 				generationalHV.add(hVal);
 			}
 			currentGen = cGen;
 		}
-		System.out.println("Total init evaluations = " + evaluations_);
+		if (indicator != null) {
+			System.out.println("Total init evaluations = " + evaluations_);
+		}
 
 		// STEP 1.3. Initialize z_
 		initIdealPoint();
@@ -373,9 +393,13 @@ public class MOEAD_DRA_VerCZ extends Algorithm {
 
 				int newGen = evaluations_ / reportInterval;
 				if (newGen > currentGen) {
-					double hVal = indicator.getHypervolume(population_);
-					hVal = indicator.getHypervolume(population_);
-					System.out.println("Hypervolume: " + (evaluations_ / 100) + " - " + hVal);
+					double hVal = -1.0;
+					if (indicator != null) {
+						hVal = indicator.getHypervolume(population_);
+					}
+					if (indicator != null) {
+						System.out.println("Hypervolume: " + (evaluations_ / 100) + " - " + hVal);
+					}
 					for (int j = currentGen; j < newGen; j++) {
 						generationalHV.add(hVal);
 					}
@@ -390,35 +414,48 @@ public class MOEAD_DRA_VerCZ extends Algorithm {
 			}
 		} while (evaluations_ < maxEvaluations);
 
-		for (int i = 0; i < populationSize_; i++) {
-			System.out.println(frequency_[i]);
+		if (indicator != null) {
+			for (int i = 0; i < populationSize_; i++) {
+				System.out.println(frequency_[i]);
+			}
 		}
 
 		// write generationalHV to file
-		String sGenHV = "";
-		int c = 0;
-		for (Double d : generationalHV) {
-			c++;
-			if (c * reportInterval <= maxEvaluations) {
-				sGenHV += d + ",";
+		if (indicator != null) {
+			String sGenHV = "";
+			int c = 0;
+			for (Double d : generationalHV) {
+				c++;
+				if (c * reportInterval <= maxEvaluations) {
+					sGenHV += d + ",";
+				}
 			}
-		}
 
-		try {
-			File hvFile = new File("data\\output\\runtimePerformance\\MOEAD_DRA\\SolutionSetSize" + populationSize_
-					+ "\\" + PROBLEM_NAME + "\\HV.csv");
-			File dir = new File(hvFile.getParent());
-			if (!dir.exists() && !dir.mkdirs()) {
-				System.out.println("Could not create directory path: ");
+			String fName = "data\\output\\runtimePerformance\\MOEAD_DRA\\SolutionSetSize" + populationSize_ + "\\"
+					+ PROBLEM_NAME + "\\HV.csv";
+
+			if ((problem_ instanceof ICOP)) {
+				if (!((ICOP) problem_).isVerbose())
+					fName = "data\\output\\runtimePerformance\\MOEAD_DRA\\SolutionSetSize" + populationSize_
+							+ "\\MO_ICOP_GenWise\\" + "d" + ((ICOP) problem_).getDimension() + "_p"
+							+ ((ICOP) problem_).getProblemID() + "_k" + ((ICOP) problem_).getK() + "\\HV.csv";
 			}
-			if (!hvFile.exists()) {
-				hvFile.createNewFile();
+
+			try {
+				File hvFile = new File(fName);
+				File dir = new File(hvFile.getParent());
+				if (!dir.exists() && !dir.mkdirs()) {
+					System.out.println("Could not create directory path: ");
+				}
+				if (!hvFile.exists()) {
+					hvFile.createNewFile();
+				}
+				BufferedWriter bw = new BufferedWriter(new FileWriter(hvFile, true));
+				bw.write(sGenHV + "\n");
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			BufferedWriter bw = new BufferedWriter(new FileWriter(hvFile, true));
-			bw.write(sGenHV + "\n");
-			bw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
 		return population_;
@@ -517,21 +554,25 @@ public class MOEAD_DRA_VerCZ extends Algorithm {
 	 * initUniformWeight
 	 */
 	public void initUniformWeight() {
-		if ((problem_.getNumberOfObjectives() == 2) && (populationSize_ < 300)) {
+		if ((problem_.getNumberOfObjectives() == 2) && (populationSize_ <= 300)) {
 			for (int n = 0; n < populationSize_; n++) {
 				double a = 1.0 * n / (populationSize_ - 1);
 				lambda_[n][0] = a;
 				lambda_[n][1] = 1 - a;
-				System.out.println(lambda_[n][0]);
-				System.out.println(lambda_[n][1]);
+				if (!(problem_ instanceof ICOP)) {
+					System.out.println(lambda_[n][0]);
+					System.out.println(lambda_[n][1]);
+				}
 			} // for
 		} // if
 		else {
 			String dataFileName;
 			dataFileName = "W" + problem_.getNumberOfObjectives() + "D_" + populationSize_ + ".dat";
 
-			System.out.println(dataDirectory_);
-			System.out.println(dataDirectory_ + "/" + dataFileName);
+			if (!(problem_ instanceof ICOP)) {
+				System.out.println(dataDirectory_);
+				System.out.println(dataDirectory_ + "/" + dataFileName);
+			}
 
 			DistributionGenerator_VerCZ dg = new DistributionGenerator_VerCZ();
 			dg.createDistribution(problem_.getNumberOfObjectives(), populationSize_,
@@ -543,14 +584,12 @@ public class MOEAD_DRA_VerCZ extends Algorithm {
 				InputStreamReader isr = new InputStreamReader(fis);
 				BufferedReader br = new BufferedReader(isr);
 
-				int numberOfObjectives = 0;
 				int i = 0;
 				int j = 0;
 				String aux = br.readLine();
 				while (aux != null) {
 					StringTokenizer st = new StringTokenizer(aux);
 					j = 0;
-					numberOfObjectives = st.countTokens();
 					while (st.hasMoreTokens()) {
 						double value = (new Double(st.nextToken())).doubleValue();
 						lambda_[i][j] = value;
