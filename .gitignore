@@ -20,17 +20,20 @@
 *.tar.gz
 *.rar
 
+#Image files
+*.png
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
 # jMetal execution outcome files
 FUN
 VAR
-.classpath
 
-# MO-ICOPs PPSN datafiles
-data/output/runtimePerformance/DECMO2++/SolutionSetSize200/MO_ICOP_Cummulative/
-data/output/runtimePerformance/GDE3/SolutionSetSize200/MO_ICOP_Cummulative/
-data/output/runtimePerformance/NSGA2/SolutionSetSize200/MO_ICOP_Cummulative/
-data/output/runtimePerformance/MOEAD_DRA/SolutionSetSize300/MO_ICOP_Cummulative/
-data/output/runtimePerformance/comparativePerformance/MOEAD_DRA_DiffSolSetSizes/
+# output files
+data/output/runtimePerformance/
+
+# radom MOEA weight files
+data/input/DECMO2PlusWeights/
+data/input/DECMO2Weights/
+data/input/MOEADWeights/
