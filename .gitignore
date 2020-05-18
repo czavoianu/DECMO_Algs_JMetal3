@@ -32,3 +32,8 @@ VAR
 
 # MO-ICOPs PPSN datafiles
 data/output/runtimePerformance/
+
+# radom MOEA weight files
+data/input/DECMO2PlusWeights/
+data/input/DECMO2Weights/
+data/input/MOEADWeights/
