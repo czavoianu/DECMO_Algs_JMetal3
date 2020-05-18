@@ -32,4 +32,4 @@ VAR
 
 # MO-ICOPs PPSN datafiles
 data/output/runtimePerformance/
-/jmetal/problems/MO_ICOP/bestKnownParetoFronts/plots
+jmetal/problems/MO_ICOP/bestKnownParetoFronts/plots
