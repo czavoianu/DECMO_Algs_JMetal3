@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -40,6 +39,7 @@ import jmetal.problems.LZ09.LZ09_F6;
 import jmetal.problems.LZ09.LZ09_F7;
 import jmetal.problems.LZ09.LZ09_F8;
 import jmetal.problems.LZ09.LZ09_F9;
+import jmetal.problems.MO_ICOP.ICOP;
 import jmetal.problems.WFG.WFG1;
 import jmetal.problems.WFG.WFG2;
 import jmetal.problems.WFG.WFG3;
@@ -55,7 +55,6 @@ import jmetal.problems.ZDT.ZDT3;
 import jmetal.problems.ZDT.ZDT4;
 import jmetal.problems.ZDT.ZDT6;
 import jmetal.qualityIndicator.QualityIndicator;
-import jmetal.util.Distance;
 import jmetal.util.JMException;
 import jmetal.util.Spea2Fitness;
 
@@ -71,6 +70,8 @@ public class DECMO_VerCZ extends Algorithm {
 
 	private static String PROBLEM_NAME = "Problem";
 
+	final static String UNKNOWN_PF = "UNKNOWN_PF";
+
 	/**
 	 * Constructor
 	 * 
@@ -79,7 +80,7 @@ public class DECMO_VerCZ extends Algorithm {
 	 */
 	public DECMO_VerCZ(Problem problem) {
 		this.problem_ = problem;
-	} // GDE3
+	} // DECMO_VerCZ
 
 	/**
 	 * Run the DECMO algorithm.
@@ -103,13 +104,11 @@ public class DECMO_VerCZ extends Algorithm {
 		SolutionSet pool2;
 		SolutionSet offspringPop1;
 		SolutionSet offspringPop2;
-		SolutionSet union;
 
 		int reportInterval;
 		int currentGen = 0;
 
-		Distance distance;
-		Comparator dominance;
+		jmetal.base.operator.comparator.DominanceComparator dominance;
 
 		// Read the DECMO parameters
 		populationSize = ((Integer) this.getInputParameter("individualPopulationSize")).intValue();
@@ -135,7 +134,6 @@ public class DECMO_VerCZ extends Algorithm {
 		crossoverOperator2.setParameter("CR", 0.2);
 		crossoverOperator2.setParameter("F", 0.5);
 
-		distance = new Distance();
 		dominance = new jmetal.base.operator.comparator.DominanceComparator();
 
 		// Array for storing runtime Pareto Front quality
@@ -143,7 +141,6 @@ public class DECMO_VerCZ extends Algorithm {
 
 		Solution parent1[] = new Solution[2];
 		Solution parent2[];
-		Solution parent3[];
 
 		if (problem_ instanceof DTLZ1) {
 			PROBLEM_NAME = "DTLZ1_7";
@@ -239,6 +236,10 @@ public class DECMO_VerCZ extends Algorithm {
 			PROBLEM_NAME = "KSW_10";
 		}
 
+		if (problem_ instanceof ICOP) {
+			PROBLEM_NAME = UNKNOWN_PF;
+		}
+
 		int pool1Size = populationSize;
 		int pool2Size = populationSize;
 
@@ -270,8 +271,10 @@ public class DECMO_VerCZ extends Algorithm {
 
 		int mix = mixInterval;
 
-		QualityIndicator indicator = new QualityIndicator(problem_,
-				"data\\input\\trueParetoFronts\\" + PROBLEM_NAME + ".pareto");
+		QualityIndicator indicator = null;
+		if (!PROBLEM_NAME.equals(UNKNOWN_PF)) {
+			indicator = new QualityIndicator(problem_, "data\\input\\trueParetoFronts\\" + PROBLEM_NAME + ".pareto");
+		}
 
 		boolean initialPopulation = true;
 
@@ -343,14 +346,20 @@ public class DECMO_VerCZ extends Algorithm {
 					// Time to perform fitness sharing
 					mix = mixInterval;
 					combi = (combi.union(pool1)).union(pool2);
-					System.out.println("Combi size: " + combi.size());
+
+					if (!(problem_ instanceof ICOP)) {
+						System.out.println("Combi size: " + combi.size());
+					}
+
 					Spea2Fitness spea5 = new Spea2Fitness(combi);
 					spea5.fitnessAssign();
 					combi = spea5.environmentalSelection(pool1Size / 10);
 					pool1 = pool1.union(combi);
 					pool2 = pool2.union(combi);
 
-					System.out.println("Sizes: " + pool1.size() + " " + pool2.size());
+					if (!(problem_ instanceof ICOP)) {
+						System.out.println("Sizes: " + pool1.size() + " " + pool2.size());
+					}
 
 					spea1 = new Spea2Fitness(pool1);
 					spea1.fitnessAssign();
@@ -366,9 +375,13 @@ public class DECMO_VerCZ extends Algorithm {
 			}
 			iterations++;
 
-			double hVal1 = indicator.getHypervolume(pool1);
-			double hVal2 = indicator.getHypervolume(pool2);
-			System.out.println("Hypervolume: " + iterations + " - " + hVal1 + " - " + hVal2);
+			double hVal1 = -1.0;
+			double hVal2 = -1.0;
+			if (indicator != null) {
+				hVal1 = indicator.getHypervolume(pool1);
+				hVal2 = indicator.getHypervolume(pool2);
+				System.out.println("Hypervolume: " + iterations + " - " + hVal1 + " - " + hVal2);
+			}
 
 			int newGen = evaluations / reportInterval;
 			if (newGen > currentGen) {
@@ -376,7 +389,12 @@ public class DECMO_VerCZ extends Algorithm {
 				Spea2Fitness spea5 = new Spea2Fitness(combi);
 				spea5.fitnessAssign();
 				combi = spea5.environmentalSelection(2 * populationSize);
-				double hVal = indicator.getHypervolume(combi);
+
+				double hVal = -1.0;
+				if (indicator != null) {
+					hVal = indicator.getHypervolume(combi);
+				}
+
 				for (int i = currentGen; i < newGen; i++) {
 					generationalHV.add(hVal);
 				}
@@ -385,28 +403,29 @@ public class DECMO_VerCZ extends Algorithm {
 		} // while (main evolutionary cycle)
 
 		// write runtime generational HV to file
-		String sGenHV = "";
-		for (Double d : generationalHV) {
-			sGenHV += d + ",";
-		}
-
-		try {
-			File hvFile = new File("data\\output\\runtimePerformance\\DECMO\\SolutionSetSize" + 2 * populationSize
-					+ "\\" + PROBLEM_NAME + "\\HV.csv");
-			File dir = new File(hvFile.getParent());
-			if (!dir.exists() && !dir.mkdirs()) {
-				System.out.println("Could not create directory path: ");
+		if (!(problem_ instanceof ICOP)) {
+			String sGenHV = "";
+			for (Double d : generationalHV) {
+				sGenHV += d + ",";
 			}
-			if (!hvFile.exists()) {
-				hvFile.createNewFile();
-			}
-			BufferedWriter bw = new BufferedWriter(new FileWriter(hvFile, true));
-			bw.write(sGenHV + "\n");
-			bw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
+			try {
+				File hvFile = new File("data\\output\\runtimePerformance\\DECMO\\SolutionSetSize" + 2 * populationSize
+						+ "\\" + PROBLEM_NAME + "\\HV.csv");
+				File dir = new File(hvFile.getParent());
+				if (!dir.exists() && !dir.mkdirs()) {
+					System.out.println("Could not create directory path: ");
+				}
+				if (!hvFile.exists()) {
+					hvFile.createNewFile();
+				}
+				BufferedWriter bw = new BufferedWriter(new FileWriter(hvFile, true));
+				bw.write(sGenHV + "\n");
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		// Return the first non-dominated front
 		/**
 		 * Return the final combined non-dominated set of maximum size =
@@ -420,6 +439,7 @@ public class DECMO_VerCZ extends Algorithm {
 		return combiIni;
 	} // execute
 
+	@SuppressWarnings("unused")
 	private void saveLastArchiveToFile(SolutionSet archive) throws IOException {
 		File paretoFile = new File(
 				"data\\input\\trueParetoFronts\\" + PROBLEM_NAME + "_" + problem_.getNumberOfVariables() + ".pareto");

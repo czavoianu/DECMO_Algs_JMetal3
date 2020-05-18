@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import jmetal.base.Algorithm;
@@ -35,6 +34,7 @@ import jmetal.problems.LZ09.LZ09_F6;
 import jmetal.problems.LZ09.LZ09_F7;
 import jmetal.problems.LZ09.LZ09_F8;
 import jmetal.problems.LZ09.LZ09_F9;
+import jmetal.problems.MO_ICOP.ICOP;
 import jmetal.problems.WFG.WFG1;
 import jmetal.problems.WFG.WFG2;
 import jmetal.problems.WFG.WFG3;
@@ -66,6 +66,8 @@ public class GDE3_VerCZ extends Algorithm {
 
 	private String PROBLEM_NAME = "Problem";
 
+	final static String UNKNOWN_PF = "UNKNOWN_PF";
+
 	/**
 	 * Constructor
 	 * 
@@ -91,22 +93,19 @@ public class GDE3_VerCZ extends Algorithm {
 
 		SolutionSet population;
 		SolutionSet offspringPopulation;
-		SolutionSet union;
 
-		Distance distance;
-		Comparator dominance;
+		Distance distance = new Distance();
+
+		jmetal.base.operator.comparator.DominanceComparator dominance = new jmetal.base.operator.comparator.DominanceComparator();
 
 		Operator selectionOperator;
 		Operator crossoverOperator;
 
-		distance = new Distance();
-		dominance = new jmetal.base.operator.comparator.DominanceComparator();
-
 		// Differential evolution parameters
-		int r1;
-		int r2;
-		int r3;
-		int jrand;
+		// int r1;
+		// int r2;
+		// int r3;
+		// int jrand;
 
 		// Quality store array
 		List<Double> generationalHV = new ArrayList<Double>();
@@ -214,6 +213,10 @@ public class GDE3_VerCZ extends Algorithm {
 			PROBLEM_NAME = "KSW_10";
 		}
 
+		if (problem_ instanceof ICOP) {
+			PROBLEM_NAME = UNKNOWN_PF;
+		}
+
 		selectionOperator = operators_.get("selection");
 		crossoverOperator = operators_.get("crossover");
 
@@ -231,16 +234,27 @@ public class GDE3_VerCZ extends Algorithm {
 			population.add(newSolution);
 		} // for
 
-		QualityIndicator indicator = new QualityIndicator(problem_,
-				"data\\input\\trueParetoFronts\\" + PROBLEM_NAME + ".pareto");
+		QualityIndicator indicator = null;
+		if (!PROBLEM_NAME.equals(UNKNOWN_PF)) {
+			indicator = new QualityIndicator(problem_, "data\\input\\trueParetoFronts\\" + PROBLEM_NAME + ".pareto");
+		} else {
+			if (!((ICOP) problem_).isVerbose()) {
+				indicator = new QualityIndicator(problem_,
+						"jmetal\\problems\\MO_ICOP\\bestKnownParetoFronts\\" + "d" + ((ICOP) problem_).getDimension()
+								+ "_p" + ((ICOP) problem_).getProblemID() + "_k" + ((ICOP) problem_).getK() + ".csv");
+			}
+		}
 
 		/** record the generational HV of the initial population */
 		int cGen = evaluations / reportInterval;
 		if (cGen > 0) {
 
-			double hVal = indicator.getHypervolume(population);
-			hVal = indicator.getHypervolume(population);
-			System.out.println("Hypervolume: " + (evaluations / 100) + " - " + hVal);
+			double hVal = -1.0;
+			if (indicator != null) {
+				hVal = indicator.getHypervolume(population);
+				System.out.println("Hypervolume: " + (evaluations / 100) + " - " + hVal);
+			}
+
 			for (int i = 0; i < cGen; i++) {
 				generationalHV.add(hVal);
 			}
@@ -332,9 +346,13 @@ public class GDE3_VerCZ extends Algorithm {
 
 			int newGen = evaluations / reportInterval;
 			if (newGen > currentGen) {
-				double hVal = indicator.getHypervolume(population);
-				hVal = indicator.getHypervolume(population);
-				System.out.println("Hypervolume: " + (evaluations / 100) + " - " + hVal);
+
+				double hVal = -1.0;
+				if (indicator != null) {
+					hVal = indicator.getHypervolume(population);
+					System.out.println("Hypervolume: " + (evaluations / 100) + " - " + hVal);
+				}
+
 				for (int i = currentGen; i < newGen; i++) {
 					generationalHV.add(hVal);
 				}
@@ -344,28 +362,38 @@ public class GDE3_VerCZ extends Algorithm {
 		} // while
 
 		// write generationalHV to file
-		String sGenHV = "";
-		for (Double d : generationalHV) {
-			sGenHV += d + ",";
-		}
-
-		try {
-			File hvFile = new File("data\\output\\runtimePerformance\\GDE3\\SolutionSetSize" + populationSize + "\\"
-					+ PROBLEM_NAME + "\\HV.csv");
-			File dir = new File(hvFile.getParent());
-			if (!dir.exists() && !dir.mkdirs()) {
-				System.out.println("Could not create directory path: ");
+		if (indicator != null) {
+			String sGenHV = "";
+			for (Double d : generationalHV) {
+				sGenHV += d + ",";
 			}
-			if (!hvFile.exists()) {
-				hvFile.createNewFile();
-			}
-			BufferedWriter bw = new BufferedWriter(new FileWriter(hvFile, true));
-			bw.write(sGenHV + "\n");
-			bw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
+			String fName = "data\\output\\runtimePerformance\\GDE3\\SolutionSetSize" + populationSize + "\\"
+					+ PROBLEM_NAME + "\\HV.csv";
+
+			if ((problem_ instanceof ICOP)) {
+				if (!((ICOP) problem_).isVerbose())
+					fName = "data\\output\\runtimePerformance\\GDE3\\SolutionSetSize" + populationSize
+							+ "\\MO_ICOP_GenWise\\" + "d" + ((ICOP) problem_).getDimension() + "_p"
+							+ ((ICOP) problem_).getProblemID() + "_k" + ((ICOP) problem_).getK() + "\\HV.csv";
+			}
+
+			try {
+				File hvFile = new File(fName);
+				File dir = new File(hvFile.getParent());
+				if (!dir.exists() && !dir.mkdirs()) {
+					System.out.println("Could not create directory path: ");
+				}
+				if (!hvFile.exists()) {
+					hvFile.createNewFile();
+				}
+				BufferedWriter bw = new BufferedWriter(new FileWriter(hvFile, true));
+				bw.write(sGenHV + "\n");
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		// Return the first non-dominated front
 		Ranking ranking = new Ranking(population);
 		return ranking.getSubfront(0);

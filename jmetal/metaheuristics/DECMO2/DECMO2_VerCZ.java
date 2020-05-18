@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -45,6 +44,7 @@ import jmetal.problems.LZ09.LZ09_F6;
 import jmetal.problems.LZ09.LZ09_F7;
 import jmetal.problems.LZ09.LZ09_F8;
 import jmetal.problems.LZ09.LZ09_F9;
+import jmetal.problems.MO_ICOP.ICOP;
 import jmetal.problems.WFG.WFG1;
 import jmetal.problems.WFG.WFG2;
 import jmetal.problems.WFG.WFG3;
@@ -69,8 +69,12 @@ import jmetal.util.Spea2Fitness;
  */
 public class DECMO2_VerCZ extends Algorithm {
 
+	private static final long serialVersionUID = 7752528633198052495L;
+
 	final int MIN_VALUES = 0;
 	final int MAX_VALUES = 1;
+
+	final static String UNKNOWN_PF = "UNKNOWN_PF";
 
 	List<List<Double>> extremeValues = new ArrayList<List<Double>>();
 
@@ -183,21 +187,21 @@ public class DECMO2_VerCZ extends Algorithm {
 
 		double[][] lambda = new double[dirArchiveSize][nrOfObjectives];
 
-		if ((nrOfObjectives == 2) && (dirArchiveSize < 500)) {
+		if ((nrOfObjectives == 2) && (dirArchiveSize < 1000)) {
 			for (int n = 0; n < dirArchiveSize; n++) {
 				double a = 1.0 * n / (dirArchiveSize - 1);
 				lambda[n][0] = a;
 				lambda[n][1] = 1 - a;
-				System.out.println(lambda[n][0]);
-				System.out.println(lambda[n][1]);
+				// System.out.println(lambda[n][0]);
+				// System.out.println(lambda[n][1]);
 			} // for
 		} // if
 		else {
 			String dataFileName;
 			dataFileName = "W" + nrOfObjectives + "D_" + dirArchiveSize + ".dat";
 
-			System.out.println(dataDirectory);
-			System.out.println(dataDirectory + "/" + dataFileName);
+			// System.out.println(dataDirectory);
+			// System.out.println(dataDirectory + "/" + dataFileName);
 
 			DistribGen dg = new DistribGen();
 			dg.createDistribution(problem_.getNumberOfObjectives(), dirArchiveSize, dataDirectory + "/" + dataFileName);
@@ -281,7 +285,7 @@ public class DECMO2_VerCZ extends Algorithm {
 		SolutionSet dirInsertPool2;
 		SolutionSet dirInsertPool3;
 
-		Comparator dominance = new jmetal.base.operator.comparator.DominanceComparator();
+		jmetal.base.operator.comparator.DominanceComparator dominance = new jmetal.base.operator.comparator.DominanceComparator();
 
 		/** Selection operator 1 */
 		Operator selectionOperator1 = SelectionFactory.getSelectionOperator("BinaryTournament");
@@ -413,6 +417,10 @@ public class DECMO2_VerCZ extends Algorithm {
 			PROBLEM_NAME = "KSW_10";
 		}
 
+		if (problem_ instanceof ICOP) {
+			PROBLEM_NAME = UNKNOWN_PF;
+		}
+
 		/** Initializations */
 		Solution parent1[] = new Solution[2];
 		Solution parent2[];
@@ -427,7 +435,9 @@ public class DECMO2_VerCZ extends Algorithm {
 		int pool2Size = populationSize - (nrOfDirectionalSolutionsToEvolve / 2);
 		int mixInterval = 1;
 
-		System.out.println(pool1Size + " - " + nrOfDirectionalSolutionsToEvolve + " - " + mixInterval);
+		if (!(problem_ instanceof ICOP)) {
+			System.out.println(pool1Size + " - " + nrOfDirectionalSolutionsToEvolve + " - " + mixInterval);
+		}
 
 		// Initialize some local and global variables
 		pool1 = new SolutionSet(pool1Size);
@@ -488,8 +498,10 @@ public class DECMO2_VerCZ extends Algorithm {
 
 		int mix = mixInterval;
 
-		QualityIndicator indicator = new QualityIndicator(problem_,
-				"data\\input\\trueParetoFronts\\" + PROBLEM_NAME + ".pareto");
+		QualityIndicator indicator = null;
+		if (!PROBLEM_NAME.equals(UNKNOWN_PF)) {
+			indicator = new QualityIndicator(problem_, "data\\input\\trueParetoFronts\\" + PROBLEM_NAME + ".pareto");
+		}
 
 		Random rndGen = new Random(System.currentTimeMillis());
 
@@ -512,8 +524,13 @@ public class DECMO2_VerCZ extends Algorithm {
 			Spea2Fitness spea0 = new Spea2Fitness(combiAll);
 			spea0.fitnessAssign();
 			combiAll = spea0.environmentalSelection(pool1Size + pool2Size);
-			double hVal = indicator.getHypervolume(combiAll);
-			System.out.println("Hypervolume: " + cGen + " - " + hVal);
+
+			double hVal = -1.0;
+			if (indicator != null) {
+				hVal = indicator.getHypervolume(combiAll);
+				System.out.println("Hypervolume: " + cGen + " - " + hVal);
+			}
+
 			for (int j = 0; j < cGen; j++) {
 				generationalHV.add(hVal);
 			}
@@ -696,7 +713,9 @@ public class DECMO2_VerCZ extends Algorithm {
 			if (mix == 0) {
 				mix = mixInterval;
 				combi = ((combi.union(pool1)).union(pool2)).union(offspringPop3);
-				System.out.println("Combi size: " + combi.size());
+				if (!(problem_ instanceof ICOP)) {
+					System.out.println("Combi size: " + combi.size());
+				}
 				Spea2Fitness spea5 = new Spea2Fitness(combi);
 				spea5.fitnessAssign();
 				combi = spea5.environmentalSelection(nrOfDirectionalSolutionsToEvolve);
@@ -704,30 +723,40 @@ public class DECMO2_VerCZ extends Algorithm {
 				insertionRate[0] /= mixInterval;
 				insertionRate[1] /= mixInterval;
 				insertionRate[2] /= mixInterval;
-				System.out.println("Insertion rates: " + insertionRate[0] + " - " + insertionRate[1] + " - "
-						+ insertionRate[2] + " - Test run:" + testRun);
+				if (!(problem_ instanceof ICOP)) {
+					System.out.println("Insertion rates: " + insertionRate[0] + " - " + insertionRate[1] + " - "
+							+ insertionRate[2] + " - Test run:" + testRun);
+				}
 
 				if (testRun) {
 					if ((insertionRate[0] > insertionRate[1]) && (insertionRate[0] > insertionRate[2])) {
-						System.out.println("SPEA2 win - bonus run!");
+						if (!(problem_ instanceof ICOP)) {
+							System.out.println("SPEA2 win - bonus run!");
+						}
 						bonusEvals[0] = nrOfDirectionalSolutionsToEvolve;
 						bonusEvals[1] = 0;
 						bonusEvals[2] = 0;
 					}
 					if ((insertionRate[1] > insertionRate[0]) && (insertionRate[1] > insertionRate[2])) {
-						System.out.println("DE win - bonus run!");
+						if (!(problem_ instanceof ICOP)) {
+							System.out.println("DE win - bonus run!");
+						}
 						bonusEvals[0] = 0;
 						bonusEvals[1] = nrOfDirectionalSolutionsToEvolve;
 						bonusEvals[2] = 0;
 					}
 					if ((insertionRate[2] > insertionRate[0]) && (insertionRate[2] > insertionRate[1])) {
-						System.out.println("Directional win - no bonus!");
+						if (!(problem_ instanceof ICOP)) {
+							System.out.println("Directional win - no bonus!");
+						}
 						bonusEvals[0] = 0;
 						bonusEvals[1] = 0;
 						bonusEvals[2] = nrOfDirectionalSolutionsToEvolve;
 					}
 				} else {
-					System.out.println("Test run - no bonus!");
+					if (!(problem_ instanceof ICOP)) {
+						System.out.println("Test run - no bonus!");
+					}
 					bonusEvals[0] = 0;
 					bonusEvals[1] = 0;
 					bonusEvals[2] = nrOfDirectionalSolutionsToEvolve;
@@ -741,7 +770,9 @@ public class DECMO2_VerCZ extends Algorithm {
 				pool1 = pool1.union(combi);
 				pool2 = pool2.union(combi);
 
-				System.out.println("Sizes: " + pool1.size() + " " + pool2.size());
+				if (!(problem_ instanceof ICOP)) {
+					System.out.println("Sizes: " + pool1.size() + " " + pool2.size());
+				}
 
 				spea1 = new Spea2Fitness(pool1);
 				spea1.fitnessAssign();
@@ -754,20 +785,31 @@ public class DECMO2_VerCZ extends Algorithm {
 				clearNfeHistory(directionalArchive);
 			}
 
-			double hVal1 = indicator.getHypervolume(pool1);
-			double hVal2 = indicator.getHypervolume(pool2);
-			double hVal3 = indicator.getHypervolume(offspringPop3);
-
+			double hVal1 = -1.0;
+			double hVal2 = -1.0;
+			double hVal3 = -1.0;
+			if (indicator != null) {
+				hVal1 = indicator.getHypervolume(pool1);
+				hVal2 = indicator.getHypervolume(pool2);
+				hVal3 = indicator.getHypervolume(offspringPop3);
+			}
 			int newGen = evaluations / reportInterval;
 			if (newGen > currentGen) {
 
-				System.out.println("Hypervolume: " + newGen + " - " + hVal1 + " - " + hVal2 + " - " + hVal3);
+				if (!(problem_ instanceof ICOP)) {
+					System.out.println("Hypervolume: " + newGen + " - " + hVal1 + " - " + hVal2 + " - " + hVal3);
+				}
 
 				combi = (((combi.union(pool1)).union(pool2)).union(offspringPop3));
 				Spea2Fitness spea5 = new Spea2Fitness(combi);
 				spea5.fitnessAssign();
 				combi = spea5.environmentalSelection(populationSize * 2);
-				double hVal = indicator.getHypervolume(combi);
+
+				double hVal = -1.0;
+				if (indicator != null) {
+					hVal = indicator.getHypervolume(combi);
+				}
+
 				for (int j = currentGen; j < newGen; j++) {
 					generationalHV.add(hVal);
 				}
@@ -777,28 +819,29 @@ public class DECMO2_VerCZ extends Algorithm {
 		} // while (main evolutionary cycle)
 
 		// write runtime generational HV to file
-		String sGenHV = "";
-		for (Double d : generationalHV) {
-			sGenHV += d + ",";
-		}
-
-		try {
-			File hvFile = new File("data\\output\\runtimePerformance\\DECMO2\\SolutionSetSize" + 2 * populationSize
-					+ "\\" + PROBLEM_NAME + "\\HV.csv");
-			File dir = new File(hvFile.getParent());
-			if (!dir.exists() && !dir.mkdirs()) {
-				System.out.println("Could not create directory path: ");
+		if (!(problem_ instanceof ICOP)) {
+			String sGenHV = "";
+			for (Double d : generationalHV) {
+				sGenHV += d + ",";
 			}
-			if (!hvFile.exists()) {
-				hvFile.createNewFile();
-			}
-			BufferedWriter bw = new BufferedWriter(new FileWriter(hvFile, true));
-			bw.write(sGenHV + "\n");
-			bw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
+			try {
+				File hvFile = new File("data\\output\\runtimePerformance\\DECMO2\\SolutionSetSize" + 2 * populationSize
+						+ "\\" + PROBLEM_NAME + "\\HV.csv");
+				File dir = new File(hvFile.getParent());
+				if (!dir.exists() && !dir.mkdirs()) {
+					System.out.println("Could not create directory path: ");
+				}
+				if (!hvFile.exists()) {
+					hvFile.createNewFile();
+				}
+				BufferedWriter bw = new BufferedWriter(new FileWriter(hvFile, true));
+				bw.write(sGenHV + "\n");
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		/**
 		 * Return the final combined non-dominated set of maximum size =
 		 * (populationSize * 2)
