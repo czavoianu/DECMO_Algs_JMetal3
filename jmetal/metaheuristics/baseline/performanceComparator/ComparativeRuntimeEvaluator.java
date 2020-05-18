@@ -687,7 +687,7 @@ public class ComparativeRuntimeEvaluator {
 
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize50//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize100//");
-		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize200//");
+		classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize200//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize300//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize400//");
 		// classesToCompare.add("data//output//runtimePerformance//DECMO2++//SolutionSetSize500//");
@@ -701,7 +701,7 @@ public class ComparativeRuntimeEvaluator {
 
 		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize50//");
 		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize100//");
-		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize200//");
+		classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize200//");
 		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize300//");
 		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize400//");
 		// classesToCompare.add("data//output//runtimePerformance//GDE3//SolutionSetSize500//");
@@ -759,9 +759,9 @@ public class ComparativeRuntimeEvaluator {
 		// problemsToUseInComparison.add(new ZDT4("Real", 10)); // 30
 		// problemsToUseInComparison.add(new ZDT6("Real", 10)); // 31
 
-		int[] dimensions = { 30 };
+		int[] dimensions = { 5, 10, 20, 30 };
 		for (int problemID = 1; problemID <= 50; problemID++) {
-			for (int k = 1; k <= 1; k++) {
+			for (int k = 1; k <= 6; k++) {
 				for (int d = 0; d < dimensions.length; d++) {
 					problemsToUseInComparison.add(new ICOP("Real", problemID, dimensions[d], k, false, 2));
 				}
