@@ -28,4 +28,4 @@ FUN
 VAR
 
 # MO-ICOPs PPSN datafiles
-data/output/runtimePerformance/
+data\output\runtimePerformance\
