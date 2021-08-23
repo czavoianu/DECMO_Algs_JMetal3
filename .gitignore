@@ -33,6 +33,9 @@ VAR
 # output files
 data/output/runtimePerformance/
 
+# MO-ICOPs problem definition files
+jmetal/problems/MO_ICOP/
+
 # radom MOEA weight files
 data/input/DECMO2PlusWeights/
 data/input/DECMO2Weights/
