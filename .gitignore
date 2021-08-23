@@ -30,7 +30,7 @@ hs_err_pid*
 FUN
 VAR
 
-# MO-ICOPs PPSN datafiles
+# output files
 data/output/runtimePerformance/
 
 # radom MOEA weight files
