@@ -89,7 +89,7 @@ public class DECMO2Plus_main_VerCZ {
 		 * number of times each problem should be solved (i.e., independent
 		 * algorithm iterations)
 		 */
-		int algRepeats = 45;
+		int algRepeats = 5;
 
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {

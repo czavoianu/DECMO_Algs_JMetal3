@@ -168,7 +168,7 @@ public class NSGAII_main_VerCZ {
 
 		problemsToSolve.add(new ICOP("Real", problemID, dimension, k, false, objCount));
 
-		int algRepeats = 45;
+		int algRepeats = 5;
 
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {
