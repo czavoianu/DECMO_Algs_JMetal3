@@ -235,6 +235,12 @@ public class SPEA2_VerCZ extends Algorithm {
 		QualityIndicator indicator = null;
 		if (!PROBLEM_NAME.equals(UNKNOWN_PF)) {
 			indicator = new QualityIndicator(problem_, "data\\input\\trueParetoFronts\\" + PROBLEM_NAME + ".pareto");
+		} else {
+			if (!((ICOP) problem_).isVerbose()) {
+				indicator = new QualityIndicator(problem_,
+						"jmetal\\problems\\MO_ICOP\\bestKnownParetoFronts\\" + "d" + ((ICOP) problem_).getDimension()
+								+ "_p" + ((ICOP) problem_).getProblemID() + "_k" + ((ICOP) problem_).getK() + ".csv");
+			}
 		}
 
 		/** record the generational HV of the initial population */
@@ -304,15 +310,25 @@ public class SPEA2_VerCZ extends Algorithm {
 		} // while
 
 		// write generationalHV to file
-		if (!(problem_ instanceof ICOP)) {
+		if (indicator != null) {
 			String sGenHV = "";
 			for (Double d : generationalHV) {
 				sGenHV += d + ",";
 			}
 
+			String fName = "data\\output\\runtimePerformance\\SPEA2\\SolutionSetSize" + populationSize + "\\"
+					+ PROBLEM_NAME + "\\HV.csv";
+
+			if ((problem_ instanceof ICOP)) {
+				if (!((ICOP) problem_).isVerbose()) {
+					fName = "data\\output\\runtimePerformance\\SPEA2\\SolutionSetSize" + populationSize
+							+ "\\MO_ICOP_GenWise\\" + "d" + ((ICOP) problem_).getDimension() + "_p"
+							+ ((ICOP) problem_).getProblemID() + "_k" + ((ICOP) problem_).getK() + "\\HV.csv";
+				}
+			}
+
 			try {
-				File hvFile = new File("data\\output\\runtimePerformance\\SPEA2\\SolutionSetSize" + populationSize
-						+ "\\" + PROBLEM_NAME + "\\HV.csv");
+				File hvFile = new File(fName);
 				File dir = new File(hvFile.getParent());
 				if (!dir.exists() && !dir.mkdirs()) {
 					System.out.println("Could not create directory path: ");

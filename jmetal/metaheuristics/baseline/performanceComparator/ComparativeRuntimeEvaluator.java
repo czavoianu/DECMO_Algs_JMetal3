@@ -654,7 +654,7 @@ public class ComparativeRuntimeEvaluator {
 		 * "DECMO2vsNSGA2" = comparison between the DECMO2 and NSGA2 solvers
 		 */
 		// String nameOfAnalysis = "allAlgorithms_SmallPopSize";
-		String nameOfAnalysis = "MO_ICOP_comparative";
+		String nameOfAnalysis = "MO_ICOP_comparative_3Obj";
 
 		/**
 		 * Type of rankings to use when building the Hypervolume-Ranked
@@ -694,7 +694,7 @@ public class ComparativeRuntimeEvaluator {
 
 		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize50//");
 		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize100//");
-		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize200//");
+		classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize200//");
 		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize300//");
 		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize400//");
 		// classesToCompare.add("data//output//runtimePerformance//SPEA2//SolutionSetSize500//");
@@ -759,11 +759,22 @@ public class ComparativeRuntimeEvaluator {
 		// problemsToUseInComparison.add(new ZDT4("Real", 10)); // 30
 		// problemsToUseInComparison.add(new ZDT6("Real", 10)); // 31
 
-		int[] dimensions = { 5, 10, 20, 30 };
-		for (int problemID = 1; problemID <= 50; problemID++) {
-			for (int k = 1; k <= 6; k++) {
+		// TODO enable full-test if necessary
+		// int[] dimensions = { 5, 10, 20, 30 };
+		// for (int problemID = 1; problemID <= 50; problemID++) {
+		// for (int k = 1; k <= 6; k++) {
+		// for (int d = 0; d < dimensions.length; d++) {
+		// problemsToUseInComparison.add(new ICOP("Real", problemID,
+		// dimensions[d], k, false, 2));
+		// }
+		// }
+		// }
+
+		int[] dimensions = { 5 };
+		for (int problemID = 51; problemID <= 51; problemID++) {
+			for (int k = 3; k <= 3; k++) {
 				for (int d = 0; d < dimensions.length; d++) {
-					problemsToUseInComparison.add(new ICOP("Real", problemID, dimensions[d], k, false, 2));
+					problemsToUseInComparison.add(new ICOP("Real", problemID, dimensions[d], k, false, 3));
 				}
 			}
 		}
@@ -895,7 +906,7 @@ public class ComparativeRuntimeEvaluator {
 				}
 
 				if (problem instanceof ICOP) {
-					problemName = "MO_ICOP_Cummulative\\" + "d" + ((ICOP) problem).getDimension() + "_p"
+					problemName = "MO_ICOP_GenWise\\" + "d" + ((ICOP) problem).getDimension() + "_p"
 							+ ((ICOP) problem).getProblemID() + "_k" + ((ICOP) problem).getK();
 				}
 

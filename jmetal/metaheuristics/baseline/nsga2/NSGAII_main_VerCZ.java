@@ -156,18 +156,19 @@ public class NSGAII_main_VerCZ {
 		// problemsToSolve.add(new ZDT6("Real"));
 
 		/** Benchmark problems with UNKNOWN PFs */
-		Integer problemID = 1;
-		Integer dimension = 10;
-		Integer k = 1;
+		Integer problemID = 51;
+		Integer dimension = 5;
+		Integer objCount = 3;
+		Integer k = 3;
 		if (args.length != 0) {
 			problemID = Integer.parseInt(args[0]);
 			dimension = Integer.parseInt(args[1]);
 			k = Integer.parseInt(args[2]);
 		}
 
-		problemsToSolve.add(new ICOP("Real", problemID, dimension, k, false, 2));
+		problemsToSolve.add(new ICOP("Real", problemID, dimension, k, false, objCount));
 
-		int algRepeats = 1;
+		int algRepeats = 45;
 
 		for (Problem problem : problemsToSolve) {
 			for (int i = 0; i < algRepeats; i++) {
