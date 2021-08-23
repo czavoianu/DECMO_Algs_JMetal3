@@ -28,14 +28,9 @@ public class ICOP extends Problem {
 	protected int interpolationK_;
 
 	/**
-	 * Stores the 1syt ICOP problem
+	 * Stores the individual ICOP problems
 	 */
-	protected ICOProblem pb1_;
-
-	/**
-	 * Stores the 2nd ICOP problem
-	 */
-	protected ICOProblem pb2_;
+	protected ICOProblem[] pbs_;
 
 	/**
 	 * Indicates if the individuals evaluated during the run are shown in the
@@ -99,11 +94,16 @@ public class ICOP extends Problem {
 		// Create problem loader
 		ProblemLoader loader = new ProblemLoader(domain, interpolationMethod);
 
+		pbs_ = new ICOProblem[numberOfObjectives_];
 		try {
-			pb1_ = loader.loadProblem("jmetal\\problems\\MO_ICOP\\sampledPoints\\D" + numberOfVariables_ + "\\MOOP"
-					+ problemName_ + "\\P1\\");
-			pb2_ = loader.loadProblem("jmetal\\problems\\MO_ICOP\\sampledPoints\\D" + numberOfVariables_ + "\\MOOP"
-					+ problemName_ + "\\P2\\");
+			for (int i = 0; i < numberOfObjectives_; i++) {
+				pbs_[i] = loader.loadProblem("jmetal\\problems\\MO_ICOP\\sampledPoints\\D" + numberOfVariables_
+						+ "\\MOOP" + problemName_ + "\\P" + (i + 1) + "\\");
+			}
+			// pb2_ =
+			// loader.loadProblem("jmetal\\problems\\MO_ICOP\\sampledPoints\\D"
+			// + numberOfVariables_ + "\\MOOP"
+			// + problemName_ + "\\P2\\");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -119,7 +119,7 @@ public class ICOP extends Problem {
 	 * @throws IOException
 	 */
 	public void evaluate(Solution solution) throws JMException {
-		double[] fx = new double[2]; // function values
+		double[] fx = new double[numberOfObjectives_]; // function values
 
 		XReal x = new XReal(solution);
 		double[] xD = new double[numberOfVariables_];
@@ -129,15 +129,23 @@ public class ICOP extends Problem {
 			xD[i] = x.getValue(i);
 			// s += xD[i] + ",";
 		}
-		fx[0] = pb1_.evaluate(xD);
-		fx[1] = pb2_.evaluate(xD);
-		s = s + fx[0] + "," + fx[1];
+
+		for (int i = 0; i < numberOfObjectives_; i++) {
+			fx[i] = pbs_[i].evaluate(xD);
+		}
+
+		for (int i = 0; i < numberOfObjectives_; i++) {
+			s = s + fx[i] + ",";
+		}
+		s = s.substring(0, s.length() - 1);
+
 		if (verboseRuntime_) {
 			System.out.println(s);
 		}
 
-		solution.setObjective(0, fx[0]);
-		solution.setObjective(1, fx[1]);
+		for (int i = 0; i < numberOfObjectives_; i++) {
+			solution.setObjective(i, fx[i]);
+		}
 
 	} // evaluate
 
@@ -160,6 +168,13 @@ public class ICOP extends Problem {
 	 */
 	public int getDimension() {
 		return this.numberOfVariables_;
+	}
+
+	/**
+	 * @return the Number of objective
+	 */
+	public int getNoOfObjectives() {
+		return this.numberOfObjectives_;
 	}
 
 	/**
